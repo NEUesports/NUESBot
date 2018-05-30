@@ -100,7 +100,7 @@ async def on_message(message):
         await client.send_message(message.channel, 'Done sleeping')
 
 
-async def my_background_task():
+async def poll_sheet():
     await client.wait_until_ready()
     await client.change_presence(game=discord.Game(name='Join OrgSync!'))
     while not client.is_closed:
@@ -121,7 +121,7 @@ async def my_background_task():
                 await add_role(server, usr, 'Student')
                 await log_msg(f'Added student role to `{p}` with email `{e}`.')
                 await send_welcome(usr)
-        await asyncio.sleep(10)  # task runs every 60 seconds
+        await asyncio.sleep(10)  # task runs every 10 seconds
 
 
 async def send_welcome(user: discord.Member):
@@ -129,6 +129,6 @@ async def send_welcome(user: discord.Member):
     await client.send_message(user, welcome_message)
 
 
-client.loop.create_task(my_background_task())
+client.loop.create_task(poll_sheet())
 
 client.run(DISCORD_API_KEY)
