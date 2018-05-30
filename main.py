@@ -7,9 +7,12 @@ from oauth2client.service_account import ServiceAccountCredentials
 from creds import DISCORD_API_KEY
 
 # SERVER IDs:
-
+test = False
 test_server = '355860577047937024'
 nues_server = '257145891947937808'
+
+test_log = '451514381432389642'
+nues_log = '441692695937810432'
 
 scope = ['https://spreadsheets.google.com/feeds']
 
@@ -50,7 +53,7 @@ async def add_role(server: discord.Server, user: discord.Member, role_name: str)
 
 
 async def log_msg(msg):
-    await client.send_message(discord.Object('451514381432389642'), msg)
+    await client.send_message(discord.Object(test_log if test else nues_log), msg)
 
 
 @client.event
@@ -98,13 +101,21 @@ async def on_message(message):
     elif message.content.startswith('!sleep'):
         await asyncio.sleep(5)
         await client.send_message(message.channel, 'Done sleeping')
+    elif message.content.startswith('!pm'):
+        await send_welcome(message.author)
+    elif message.content.startswith('!join'):
+        await on_member_join(message.author)
 
+@client.event
+async def on_member_join(member: discord.Member):
+    welcome_message = sheet2.col_values(2)[1].replace('$user', f'{member.mention}')
+    await log_msg(welcome_message)
 
 async def poll_sheet():
     await client.wait_until_ready()
     await client.change_presence(game=discord.Game(name='Join OrgSync!'))
     while not client.is_closed:
-        server = client.get_server(test_server)
+        server = client.get_server(test_server if test else nues_server)
         ppl = sheet.col_values(3)[1:]
         emails = sheet.col_values(2)[1:]
         for p, e in zip(ppl, emails):
