@@ -137,6 +137,8 @@ async def poll_sheet():
     while not client.is_closed:
         i += 1
         if i % 60:
+            # reauthorize once in a while to prevent 401 errors
+            gc = gspread.authorize(credentials)
             # Open a worksheet from spreadsheet with one shot
             sheet = gc.open_by_key("1zMeLAnlh8-EyXA20XPVv1nHHWu52dlcjPxojLVYR5DA").sheet1
             sheet2 = gc.open_by_key("1zMeLAnlh8-EyXA20XPVv1nHHWu52dlcjPxojLVYR5DA").get_worksheet(1)
