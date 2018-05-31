@@ -1,11 +1,11 @@
 import asyncio
+import logging
 
 import discord
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 from creds import DISCORD_API_KEY
-import logging
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.INFO)
@@ -48,10 +48,12 @@ client = discord.Client()
 
 @client.event
 async def on_ready():
+    print('------')
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
     print('------')
+
 
 def has_role(user, role_name):
     return any([r.name.lower() == role_name.lower() for r in user.roles])
@@ -59,6 +61,7 @@ def has_role(user, role_name):
 
 async def add_role(server: discord.Server, user: discord.Member, role_name: str):
     await client.add_roles(user, *[r for r in server.roles if r.name == role_name])
+
 
 async def remove_role(server: discord.Server, user: discord.Member, role_name: str):
     await client.remove_roles(user, *[r for r in server.roles if r.name == role_name])
@@ -70,7 +73,7 @@ async def log_msg(msg):
 
 @client.event
 async def on_message(message: discord.Message):
-
+    print ('msg', message.content)
     if message.content.startswith('!test') and has_role(message.author, 'Student'):
         counter = 0
         tmp = await client.send_message(message.channel, 'Calculating messages...')
@@ -109,7 +112,7 @@ async def on_message(message: discord.Message):
             await client.delete_message(message)
         empty = True
         async for log in client.logs_from(message.channel):
-            print (log)
+            print(log)
             empty = False
             break
         if empty:
@@ -119,11 +122,13 @@ async def on_message(message: discord.Message):
             m += "You can remove roles with `.iamnot <game>`"
             await client.send_message(message.channel, m)
 
+
 @client.event
 async def on_member_join(user: discord.Member):
     welcome_message = sheet2.col_values(2)[1].replace('$user', f'{user.mention}')
     await client.send_message(user, welcome_message)
     await log_msg(welcome_message)
+
 
 async def poll_sheet():
     await client.wait_until_ready()
