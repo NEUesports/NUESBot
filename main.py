@@ -5,7 +5,13 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 from creds import DISCORD_API_KEY
+import logging
 
+logger = logging.getLogger('discord')
+logger.setLevel(logging.INFO)
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
 # SERVER IDs:
 test = False
 test_server = '355860577047937024'
@@ -13,6 +19,20 @@ nues_server = '257145891947937808'
 
 test_log = '451514381432389642'
 nues_log = '441692695937810432'
+
+set_roles_channel = '451532020695433217'
+
+# VALID GAME ROLES
+game_roles = [
+    'Rocket League',
+    'PUBG',
+    'DOTA 2',
+    'Overwatch',
+    'CounterStrike',
+    'Hearthstone',
+    'Heroes of the Storm',
+    'Fortnite',
+]
 
 scope = ['https://spreadsheets.google.com/feeds']
 
@@ -33,23 +53,15 @@ async def on_ready():
     print(client.user.id)
     print('------')
 
-
-corresponding = {
-    'PUBG': 'PUBG',
-    'Rocket League': 'Rocket League',
-    'Super Smash Bros. Melee': 'SSBM',
-    'Hearthstone': 'Hearthstone',
-    'Destiny 2': 'Destiny',
-    'Civilization': 'Civilization'
-}
-
-
 def has_role(user, role_name):
-    return any([r.name == role_name for r in user.roles])
+    return any([r.name.lower() == role_name.lower() for r in user.roles])
 
 
 async def add_role(server: discord.Server, user: discord.Member, role_name: str):
     await client.add_roles(user, *[r for r in server.roles if r.name == role_name])
+
+async def remove_role(server: discord.Server, user: discord.Member, role_name: str):
+    await client.remove_roles(user, *[r for r in server.roles if r.name == role_name])
 
 
 async def log_msg(msg):
@@ -57,38 +69,7 @@ async def log_msg(msg):
 
 
 @client.event
-async def on_message(message):
-    if message.channel.is_private:
-        try:
-            found = sheet.find(message.content.lstrip('0'))
-            print(found)
-            row = found.row
-            r = sheet.row_values(row)
-            print(r, message.author, message.author.name)
-            if r[3] == message.content.lstrip('0') and r[4] == str(message.author):
-                for s in client.servers:
-                    if s.id == "257145891947937808":
-                        print(s)
-                        member = s.get_member(str(message.author.id))
-                        print(member)
-                        split = r[2].split(', ')
-                        print(split)
-                        roles = []
-                        removed_roles = []
-                        for role in s.roles:
-                            if str(role) in corresponding.values():
-                                removed_roles.append(role)
-                        await client.remove_roles(member, *roles)
-                        for role_str in split:
-
-                            if role_str in corresponding:
-                                print(role_str)
-                                roles.append([role for role in s.roles if str(role) == corresponding[role_str]][0])
-                        print(roles)
-
-                        await client.add_roles(member, *roles)
-        except Exception as e:
-            print(e)
+async def on_message(message: discord.Message):
 
     if message.content.startswith('!test') and has_role(message.author, 'Student'):
         counter = 0
@@ -105,10 +86,43 @@ async def on_message(message):
         await send_welcome(message.author)
     elif message.content.startswith('!join'):
         await on_member_join(message.author)
+    elif message.channel.name == 'set-roles':
+        if message.content.startswith('.iam ') and any([r.name == 'Student' for r in message.author.roles]):
+            msg = message.content.split(' ')
+            game_list = " ".join(msg[1:])
+            games = game_list.split(',')
+            for game in games:
+                game = game.strip()
+                if game in game_roles:
+                    await add_role(message.server, message.author, game)
+                    await log_msg(f'Added role `{game}` to `{message.author}`')
+        if message.content.startswith('.iamnot ') and any([r.name == 'Student' for r in message.author.roles]):
+            msg = message.content.split(' ')
+            game_list = " ".join(msg[1:])
+            games = game_list.split(',')
+            for game in games:
+                game = game.strip()
+                if game in game_roles:
+                    await remove_role(message.server, message.author, game)
+                    await log_msg(f'Removed role `{game}` from `{message.author}`')
+        if not message.author.name.startswith("NUESBot"):
+            await client.delete_message(message)
+        empty = True
+        async for log in client.logs_from(message.channel):
+            print (log)
+            empty = False
+            break
+        if empty:
+            m = "Available roles:\n"
+            for game in game_roles:
+                m += f"`.iam {game}`\n"
+            m += "You can remove roles with `.iamnot <game>`"
+            await client.send_message(message.channel, m)
 
 @client.event
-async def on_member_join(member: discord.Member):
-    welcome_message = sheet2.col_values(2)[1].replace('$user', f'{member.mention}')
+async def on_member_join(user: discord.Member):
+    welcome_message = sheet2.col_values(2)[1].replace('$user', f'{user.mention}')
+    await client.send_message(user, welcome_message)
     await log_msg(welcome_message)
 
 async def poll_sheet():
