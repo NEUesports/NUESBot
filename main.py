@@ -34,7 +34,8 @@ game_roles = [
     'Fortnite',
 ]
 
-scope = ['https://spreadsheets.google.com/feeds']
+scope = ['https://spreadsheets.google.com/feeds',
+         'https://www.googleapis.com/auth/drive']
 
 credentials = ServiceAccountCredentials.from_json_keyfile_name('gspread.json', scope)
 gc = gspread.authorize(credentials)
@@ -73,7 +74,7 @@ async def log_msg(msg):
 
 @client.event
 async def on_message(message: discord.Message):
-    print ('msg', message.content)
+    print('msg', message.content)
     if message.content.startswith('!test') and has_role(message.author, 'Student'):
         counter = 0
         tmp = await client.send_message(message.channel, 'Calculating messages...')
@@ -135,13 +136,8 @@ async def poll_sheet():
     await client.change_presence(game=discord.Game(name='Join OrgSync!'))
     i = 0
     while not client.is_closed:
-
-        # reauthorize once in a while to prevent 401 errors
-        gc = gspread.authorize(credentials)
-        # Open a worksheet from spreadsheet with one shot
-        sheet = gc.open_by_key("1zMeLAnlh8-EyXA20XPVv1nHHWu52dlcjPxojLVYR5DA").sheet1
-        sheet2 = gc.open_by_key("1zMeLAnlh8-EyXA20XPVv1nHHWu52dlcjPxojLVYR5DA").get_worksheet(1)
-
+        if credentials.access_token_expired:
+            gc.login()  # refreshes the token
         server = client.get_server(test_server if test else nues_server)
         ppl = sheet.col_values(3)[1:]
         emails = sheet.col_values(2)[1:]
