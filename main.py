@@ -61,20 +61,22 @@ def has_role(user, role_name):
 
 
 async def add_role(server: discord.Server, user: discord.Member, role_name: str):
+    logger.info(f'Adding role {role_name} to {user}')
     await client.add_roles(user, *[r for r in server.roles if r.name == role_name])
 
 
 async def remove_role(server: discord.Server, user: discord.Member, role_name: str):
+    logger.info(f'Removing role {role_name} from {user}')
     await client.remove_roles(user, *[r for r in server.roles if r.name == role_name])
 
 
 async def log_msg(msg):
+    logger.info(f'{msg}')
     await client.send_message(discord.Object(test_log if test else nues_log), msg)
 
 
 @client.event
 async def on_message(message: discord.Message):
-    print('msg', message.content)
     if message.content.startswith('!test') and has_role(message.author, 'Student'):
         counter = 0
         tmp = await client.send_message(message.channel, 'Calculating messages...')
@@ -92,6 +94,7 @@ async def on_message(message: discord.Message):
         await on_member_join(message.author)
     elif message.channel.name == 'set-roles':
         if message.content.startswith('.iam ') and any([r.name == 'Student' for r in message.author.roles]):
+            logger.info(f'User {message.author} requesting role change')
             msg = message.content.split(' ')
             game_list = " ".join(msg[1:])
             games = game_list.split(',')
@@ -136,6 +139,7 @@ async def poll_sheet():
     await client.change_presence(game=discord.Game(name='Join OrgSync!'))
     i = 0
     while not client.is_closed:
+        logger.info(f'Checking spreadsheets...')
         if credentials.access_token_expired:
             gc.login()  # refreshes the token
         server = client.get_server(test_server if test else nues_server)
@@ -151,16 +155,18 @@ async def poll_sheet():
             if has_role(usr, 'Student'):
                 pass
             else:
-                print('User does not have student role, adding...')
+                logger.info(f'User {usr} does not have student role, adding...')
                 await add_role(server, usr, 'Student')
                 await log_msg(f'Added student role to `{p}` with email `{e}`.')
                 await send_welcome(usr)
-        await asyncio.sleep(10)  # task runs every 10 seconds
+        logger.info(f'Done, sleeping...')
+        await asyncio.sleep(20)  # task runs every 10 seconds
 
 
 async def send_welcome(user: discord.Member):
     welcome_message = sheet2.col_values(1)[1]
     await client.send_message(user, welcome_message)
+    logger.info(f'Sent welcome message to {user}')
 
 
 client.loop.create_task(poll_sheet())
