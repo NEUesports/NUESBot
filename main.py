@@ -129,10 +129,14 @@ async def on_message(message: discord.Message):
 
 @client.event
 async def on_member_join(user: discord.Member):
-    welcome_message = sheet2.col_values(2)[1].replace('$user', f'{user.mention}')
-    await client.send_message(user, welcome_message)
-    await log_msg(welcome_message)
-
+    try:
+        welcome_message = sheet2.col_values(2)[1].replace('$user', f'{user.mention}')
+        await client.send_message(user, welcome_message)
+        await log_msg(welcome_message)
+    except discord.errors.Forbidden:
+        await log_msg(f'Could not send welcome message to {user.mention}! It is forbidden.')
+    except Exception as e:
+        await log_msg(f'Could not send welcome message to {user.mention}! {e}')
 
 async def poll_sheet():
     await client.wait_until_ready()
@@ -158,7 +162,12 @@ async def poll_sheet():
                 logger.info(f'User {usr} does not have student role, adding...')
                 await add_role(server, usr, 'Student')
                 await log_msg(f'Added student role to `{p}` with email `{e}`.')
-                await send_welcome(usr)
+                try:
+                    await send_welcome(usr)
+                except discord.errors.Forbidden:
+                    await log_msg(f'Could not send role set message to {usr.mention}! It is forbidden.')
+                except Exception as e:
+                    await log_msg(f'Could not send role set message to {usr.mention}! {e}')
         logger.info(f'Done, sleeping...')
         await asyncio.sleep(20)  # task runs every 10 seconds
 
