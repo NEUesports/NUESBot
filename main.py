@@ -126,6 +126,9 @@ async def on_message(message: discord.Message):
             m += "You can remove roles with `.iamnot <game>`"
             await client.send_message(message.channel, m)
 
+async def dontcrash():
+    channels = client.get_all_channels()
+    asyncio.sleep(50)
 
 @client.event
 async def on_member_join(user: discord.Member):
@@ -177,7 +180,7 @@ async def send_welcome(user: discord.Member):
     await client.send_message(user, welcome_message)
     logger.info(f'Sent welcome message to {user}')
 
-
+client.loop.create_task(dontcrash())
 client.loop.create_task(poll_sheet())
 
 client.run(DISCORD_API_KEY)
