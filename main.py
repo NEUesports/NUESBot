@@ -150,27 +150,42 @@ async def poll_sheet():
         if credentials.access_token_expired:
             gc.login()  # refreshes the token
         server = client.get_server(test_server if test else nues_server)
-        ppl = sheet.col_values(3)[1:]
-        emails = sheet.col_values(2)[1:]
-        for p, e in zip(ppl, emails):
-            if not e.endswith('husky.neu.edu'):
+        ppl = sheet.col_values(3)[1:][::-1]
+        emails = sheet.col_values(2)[1:][::-1] # reverse so we use the most recent
+        first_names = sheet.col_values(6)[1:][::-1]
+        ingame_names = sheet.col_values(7)[1:][::-1]
+        for i, email in enumerate(emails):
+            discord_username = ppl[i]
+            if i < len(first_names):
+                first_name = first_names[i]
+            else:
+                first_name = ""
+            if i < len(ingame_names):
+                ingame_name = ingame_names[i]
+            else:
+                ingame_name = ""
+            if not email.endswith('husky.neu.edu'):
                 continue
-            usr = server.get_member_named(p)
+            usr = server.get_member_named(discord_username)
             if usr is None:
-                # print(f'User {p} does not exist!')
+                print(f'User {discord_username} does not exist!')
                 continue
             if has_role(usr, 'Student'):
                 pass
             else:
                 logger.info(f'User {usr} does not have student role, adding...')
                 await add_role(server, usr, 'Student')
-                await log_msg(f'Added student role to `{p}` with email `{e}`.')
+                await log_msg(f'Added student role to `{discord_username}` with email `{email}`.')
+                if len(first_name) != 0 and len(ingame_name) != 0:
+                    name = f'{first_name} "{ingame_name}"'
+                    await client.change_nickname(usr, name)
+                    await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
                 try:
                     await send_welcome(usr)
                 except discord.errors.Forbidden:
                     await log_msg(f'Could not send role set message to {usr.mention}! It is forbidden.')
-                except Exception as e:
-                    await log_msg(f'Could not send role set message to {usr.mention}! {e}')
+                except Exception as exc:
+                    await log_msg(f'Could not send role set message to {usr.mention}! {exc}')
         logger.info(f'Done, sleeping...')
         await asyncio.sleep(20)  # task runs every 10 seconds
 
