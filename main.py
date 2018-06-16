@@ -150,10 +150,15 @@ async def poll_sheet():
         if credentials.access_token_expired:
             gc.login()  # refreshes the token
         server = client.get_server(test_server if test else nues_server)
-        ppl = sheet.col_values(3)[1:][::-1]
-        emails = sheet.col_values(2)[1:][::-1] # reverse so we use the most recent
-        first_names = sheet.col_values(6)[1:][::-1]
-        ingame_names = sheet.col_values(7)[1:][::-1]
+        try:
+            ppl = sheet.col_values(3)[1:][::-1]
+            emails = sheet.col_values(2)[1:][::-1] # reverse so we use the most recent
+            first_names = sheet.col_values(6)[1:][::-1]
+            ingame_names = sheet.col_values(7)[1:][::-1]
+        except gspread.exceptions.APIError:
+            log_msg('API error checking sheet, sleeping....')
+            asyncio.sleep(120)
+            continue
         for i, email in enumerate(emails):
             discord_username = ppl[i]
             if i < len(first_names):
