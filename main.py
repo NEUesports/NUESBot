@@ -144,55 +144,60 @@ async def on_member_join(user: discord.Member):
 async def poll_sheet():
     await client.wait_until_ready()
     await client.change_presence(game=discord.Game(name='Join OrgSync!'))
-    i = 0
     while not client.is_closed:
-        logger.info(f'Checking spreadsheets...')
-        if credentials.access_token_expired:
-            gc.login()  # refreshes the token
-        server = client.get_server(test_server if test else nues_server)
         try:
-            ppl = sheet.col_values(3)[1:][::-1]
-            emails = sheet.col_values(2)[1:][::-1] # reverse so we use the most recent
-            first_names = sheet.col_values(6)[1:][::-1]
-            ingame_names = sheet.col_values(7)[1:][::-1]
-        except gspread.exceptions.APIError:
-            log_msg('API error checking sheet, sleeping....')
-            asyncio.sleep(120)
-            continue
-        for i, email in enumerate(emails):
-            discord_username = ppl[i]
-            if i < len(first_names):
-                first_name = first_names[i]
-            else:
-                first_name = ""
-            if i < len(ingame_names):
-                ingame_name = ingame_names[i]
-            else:
-                ingame_name = ""
-            if not email.endswith('husky.neu.edu'):
+            logger.info(f'Checking spreadsheets...')
+            if credentials.access_token_expired:
+                gc.login()  # refreshes the token
+            server = client.get_server(test_server if test else nues_server)
+            try:
+                ppl = sheet.col_values(3)[1:][::-1]
+                emails = sheet.col_values(2)[1:][::-1] # reverse so we use the most recent
+                first_names = sheet.col_values(6)[1:][::-1]
+                ingame_names = sheet.col_values(7)[1:][::-1]
+            except gspread.exceptions.APIError:
+                log_msg('API error checking sheet, sleeping....')
+                asyncio.sleep(120)
                 continue
-            usr = server.get_member_named(discord_username)
-            if usr is None:
-                print(f'User {discord_username} does not exist!')
-                continue
-            if has_role(usr, 'Student'):
-                pass
-            else:
-                logger.info(f'User {usr} does not have student role, adding...')
-                await add_role(server, usr, 'Student')
-                await log_msg(f'Added student role to `{discord_username}` with email `{email}`.')
-                if len(first_name) != 0 and len(ingame_name) != 0:
-                    name = f'{first_name} "{ingame_name}"'
-                    await client.change_nickname(usr, name)
-                    await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
-                try:
-                    await send_welcome(usr)
-                except discord.errors.Forbidden:
-                    await log_msg(f'Could not send role set message to {usr.mention}! It is forbidden.')
-                except Exception as exc:
-                    await log_msg(f'Could not send role set message to {usr.mention}! {exc}')
-        logger.info(f'Done, sleeping...')
-        await asyncio.sleep(20)  # task runs every 10 seconds
+            for i, email in enumerate(emails):
+                discord_username = ppl[i]
+                if i < len(first_names):
+                    first_name = first_names[i]
+                else:
+                    first_name = ""
+                if i < len(ingame_names):
+                    ingame_name = ingame_names[i]
+                else:
+                    ingame_name = ""
+                if not email.endswith('husky.neu.edu'):
+                    continue
+                usr = server.get_member_named(discord_username)
+                if usr is None:
+                    print(f'User {discord_username} does not exist!')
+                    if ' #' in discord_username:
+                        usr = server.get_member_named(discord_username.replace(' #', '#'))
+                    if usr is None:
+                        continue
+                if has_role(usr, 'Student'):
+                    pass
+                else:
+                    logger.info(f'User {usr} does not have student role, adding...')
+                    await add_role(server, usr, 'Student')
+                    await log_msg(f'Added student role to `{discord_username}` with email `{email}`.')
+                    if len(first_name) != 0 and len(ingame_name) != 0:
+                        name = f'{first_name} "{ingame_name}"'
+                        await client.change_nickname(usr, name)
+                        await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
+                    try:
+                        await send_welcome(usr)
+                    except discord.errors.Forbidden:
+                        await log_msg(f'Could not send role set message to {usr.mention}! It is forbidden.')
+                    except Exception as exc:
+                        await log_msg(f'Could not send role set message to {usr.mention}! {exc}')
+            logger.info(f'Done, sleeping...')
+            await asyncio.sleep(20)  # task runs every 10 seconds
+        except Exception as e:
+            log_msg(f'Error checking spreadsheet: {e}')
 
 
 async def send_welcome(user: discord.Member):
