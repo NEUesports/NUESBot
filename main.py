@@ -199,11 +199,14 @@ async def poll_sheet():
         except Exception as e:
             log_msg(f'Error checking spreadsheet: {e}')
 
-
 async def send_welcome(user: discord.Member):
     welcome_message = sheet2.col_values(1)[1]
     await client.send_message(user, welcome_message)
     logger.info(f'Sent welcome message to {user}')
+
+# event to update when game chairs are created
+@client.event
+async def new_game_role
 
 client.loop.create_task(dontcrash())
 client.loop.create_task(poll_sheet())
