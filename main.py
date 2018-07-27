@@ -213,16 +213,15 @@ async def on_server_role_update(role):
         # role is a game role
         role_msg = client.get_message(client.get_channel('451532020695433217'), '451547972161896448')
         split = role_msg.content.split("You can remove roles")
-        let new_msg = split[0] + f"`.iam {role.name}`\n" + "You can remove roles with `.iamnot <game>`")
+        new_msg = split[0] + f"`.iam {role.name}`\n" + "You can remove roles with `.iamnot <game>`"
         client.edit_message(role_msg, new_msg)
 
-@client.event
-async def on_reaction_add(reaction: discord.reaction, user: discord.user):
-
+    await client.delete_message(msg)
 
 # event to update when game chairs are created
 @client.event
-async def new_game_role
+async def new_game_role():
+    return
 
 client.loop.create_task(dontcrash())
 client.loop.create_task(poll_sheet())
