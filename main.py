@@ -120,11 +120,16 @@ async def on_message(message: discord.Message):
             empty = False
             break
         if empty:
-            m = "Available roles:\n"
-            for game in game_roles:
-                m += f"`.iam {game}`\n"
-            m += "You can remove roles with `.iamnot <game>`"
+            m = buildGRMsg()
             await client.send_message(message.channel, m)
+
+# build the game roles message
+def buildGRMsg():
+    m = "Available roles:\n"
+    for game in game_roles:
+        m += f"`.iam {game}`\n"
+    m += "You can remove roles with `.iamnot <game>`"
+    return m
 
 async def dontcrash():
     channels = client.get_all_channels()
@@ -211,9 +216,9 @@ async def on_server_role_update(role):
     res = await client.wait_for_reaction(['✅', '❌'], message=msg)
     if(res.reaction.emoji=='✅'):
         # role is a game role
-        role_msg = client.get_message(client.get_channel('451532020695433217'), '451547972161896448')
-        split = role_msg.content.split("You can remove roles")
-        new_msg = split[0] + f"`.iam {role.name}`\n" + "You can remove roles with `.iamnot <game>`"
+        role_msg = buildGRMsg()
+        game_roles.append(role.name)
+        new_msg = buildGRMsg()
         client.edit_message(role_msg, new_msg)
 
     await client.delete_message(msg)
