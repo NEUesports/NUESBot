@@ -204,6 +204,22 @@ async def send_welcome(user: discord.Member):
     await client.send_message(user, welcome_message)
     logger.info(f'Sent welcome message to {user}')
 
+@client.event
+async def on_server_role_update(role):
+    # now can message user to determine if game role
+    msg = await client.send_message(client.get_channel('451532020695433217'), 'React with check mark if ' + role.name + ' is a game role, x if it is not a game role')
+    res = await client.wait_for_reaction(['✅', '❌'], message=msg)
+    if(res.reaction.emoji===✅):
+        # role is a game role
+        role_msg = client.get_message(client.get_channel('451532020695433217'), '451547972161896448')
+        split = role_msg.content.split("You can remove roles")
+        let new_msg = split[0] + f"`.iam {role.name}`\n" + "You can remove roles with `.iamnot <game>`"
+        client.edit_message(role_msg, new_msg)
+
+@client.event
+async def on_reaction_add(reaction: discord.reaction, user: discord.user):
+
+
 # event to update when game chairs are created
 @client.event
 async def new_game_role
