@@ -204,29 +204,38 @@ async def poll_sheet():
         except Exception as e:
             log_msg(f'Error checking spreadsheet: {e}')
 
+#@matt mage, do we need this code block below here? I think it is doing
+#what is done above in the on_member_join function?
 async def send_welcome(user: discord.Member):
     welcome_message = sheet2.col_values(1)[1]
     await client.send_message(user, welcome_message)
     logger.info(f'Sent welcome message to {user}')
 
 @client.event
-async def on_server_role_update(role):
-    # now can message user to determine if game role
-    msg = await client.send_message(client.get_channel('451532020695433217'), 'React with check mark if ' + role.name + ' is a game role, x if it is not a game role')
-    res = await client.wait_for_reaction(['✅', '❌'], message=msg)
-    if(res.reaction.emoji=='✅'):
-        # role is a game role
-        role_msg = buildGRMsg()
-        game_roles.append(role.name)
-        new_msg = buildGRMsg()
-        client.edit_message(role_msg, new_msg)
+#new role name definition
+new_role_prename = discord.utlis.get(server.roles, name="new role")
+new_role_postname = discord.utlis.get(server.roles, id = new_role_prename.id)
+#eboard role definition
+exec_board_role = discord.utlis.get(server.roles, name = "Executive Board", id = "359036894467850262")
+#This below should always check when role "new role" has been updated to see if the name has changed
+async def on_server_role_update(new_role_prename, new_role_postname):
+    #if the name of the role is not the same after "new role" is updated, do the following
+    if new_role_prename.name != new_role_postname.name
+        new_gamerole_msg = (exec_board_role.mention + "is" + new_role_postname.name + "a game role?")
+        await log_msg(new_gamerole_msg)
+        await add_reaction(new_gamerole_msg, '✅')
+        await add_reaction(new_gamerole_msg, '❌')
+        res = await client.wait_for_reaction(['✅', '❌'], message= new_gamerole_msg)
+        await log_msg("Thank you for your feedback!")
+        if(res.reaction.emoji=='✅'):
+            #add the game role to the game_roles list
+            #build a new GRMsg and edit the old one with the new one
+            game_roles.append(new_role_postname.name)
+            role_msg.id = '451547972161896448'
+            new_GRmsg = await buildGRMsg()
+            await client.edit_message(role_msg, new_GRmsg)
+        await client.delete_message(new_gamerole_msg)
 
-    await client.delete_message(msg)
-
-# event to update when game chairs are created
-@client.event
-async def new_game_role():
-    return
 
 client.loop.create_task(dontcrash())
 client.loop.create_task(poll_sheet())
