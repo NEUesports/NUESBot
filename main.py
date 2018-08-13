@@ -213,26 +213,27 @@ async def send_welcome(user: discord.Member):
 
 
 #eboard role definition
-exec_board_role = discord.utlis.get(server.roles, name = "Executive Board", id = "359036894467850262")
+exec_board_role = discord.utils.get(server.roles, name = "Executive Board", id = "359036894467850262")
 #This below should always check when role "new role" has been updated to see if the name has changed
 @client.event
 async def on_server_role_update(new_role_prename, new_role_postname):
-    #if the name of the role is not the same after "new role" is updated, do the following
-    if new_role_prename.name != new_role_postname.name:
-        new_gamerole_msg = (exec_board_role.mention + "is" + new_role_postname.name + "a game role?")
-        await log_msg(new_gamerole_msg)
-        await client.add_reaction(new_gamerole_msg, '✅')
-        await client.add_reaction(new_gamerole_msg, '❌')
-        res = await client.wait_for_reaction(['✅', '❌'], message= new_gamerole_msg)
-        await log_msg("Thank you for your feedback!")
-        if(res.reaction.emoji=='✅'):
-            #add the game role to the game_roles list
-            #build a new GRMsg and edit the old one with the new one
-            game_roles.append(new_role_postname.name)
-            role_msg.id = '451547972161896448'
-            new_GRmsg = await buildGRMsg()
-            await client.edit_message(role_msg, new_GRmsg)
-        await client.delete_message(new_gamerole_msg)
+    if new_role_prename.name == 'new role':
+        #if the name of the role is not the same after "new role" is updated, do the following
+        if new_role_prename.name != new_role_postname.name:
+            new_gamerole_msg = (exec_board_role.mention + "is" + new_role_postname.name + "a game role?")
+            await log_msg(new_gamerole_msg)
+            await client.add_reaction(new_gamerole_msg, '✅')
+            await client.add_reaction(new_gamerole_msg, '❌')
+            res = await client.wait_for_reaction(['✅', '❌'], message= new_gamerole_msg)
+            await log_msg("Thank you for your feedback!")
+            if(res.reaction.emoji=='✅'):
+                #add the game role to the game_roles list
+                #build a new GRMsg and edit the old one with the new one
+                game_roles.append(new_role_postname.name)
+                role_msg.id = '451547972161896448'
+                new_GRmsg = await buildGRMsg()
+                await client.edit_message(role_msg, new_GRmsg)
+            await client.delete_message(new_gamerole_msg)
 
 
 client.loop.create_task(dontcrash())
