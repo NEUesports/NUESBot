@@ -211,20 +211,18 @@ async def send_welcome(user: discord.Member):
     await client.send_message(user, welcome_message)
     logger.info(f'Sent welcome message to {user}')
 
-@client.event
-#new role name definition
-new_role_prename = discord.utlis.get(server.roles, name="new role")
-new_role_postname = discord.utlis.get(server.roles, id = new_role_prename.id)
+
 #eboard role definition
 exec_board_role = discord.utlis.get(server.roles, name = "Executive Board", id = "359036894467850262")
 #This below should always check when role "new role" has been updated to see if the name has changed
+@client.event
 async def on_server_role_update(new_role_prename, new_role_postname):
     #if the name of the role is not the same after "new role" is updated, do the following
     if new_role_prename.name != new_role_postname.name
         new_gamerole_msg = (exec_board_role.mention + "is" + new_role_postname.name + "a game role?")
         await log_msg(new_gamerole_msg)
-        await add_reaction(new_gamerole_msg, '✅')
-        await add_reaction(new_gamerole_msg, '❌')
+        await client.add_reaction(new_gamerole_msg, '✅')
+        await client.add_reaction(new_gamerole_msg, '❌')
         res = await client.wait_for_reaction(['✅', '❌'], message= new_gamerole_msg)
         await log_msg("Thank you for your feedback!")
         if(res.reaction.emoji=='✅'):
