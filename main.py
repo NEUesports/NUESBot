@@ -214,6 +214,8 @@ async def send_welcome(user: discord.Member):
 
 #eboard role definition
 exec_board_role = discord.utlis.get(server.roles, name = "Executive Board", id = "359036894467850262")
+new_role_prename = discord.utlis.get(server.roles, name="new role")
+new_role_postname = discord.utlis.get(server.roles, id = new_role_prename.id)
 #This below should always check when role "new role" has been updated to see if the name has changed
 @client.event
 async def on_server_role_update(new_role_prename, new_role_postname):
