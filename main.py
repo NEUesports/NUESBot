@@ -13,7 +13,7 @@ handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w'
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 # SERVER IDs:
-test = False
+test = True
 test_server = '355860577047937024'
 nues_server = '257145891947937808'
 
@@ -46,6 +46,7 @@ sheet2 = gc.open_by_key("1zMeLAnlh8-EyXA20XPVv1nHHWu52dlcjPxojLVYR5DA").get_work
 
 client = discord.Client()
 
+server = discord.Object(test_server if test else nues_server)
 
 @client.event
 async def on_ready():
