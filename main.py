@@ -113,7 +113,7 @@ async def on_message(message: discord.Message):
                 if game in game_roles:
                     await remove_role(message.server, message.author, game)
                     await log_msg(f'Removed role `{game}` from `{message.author}`')
-        if not message.author.name.startswith("NUESBot"):
+        if message.author.name != client.user.name:
             await client.delete_message(message)
         empty = True
         async for log in client.logs_from(message.channel):
