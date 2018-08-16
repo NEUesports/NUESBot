@@ -177,6 +177,7 @@ async def poll_sheet():
                     ingame_name = ""
                 if not email.endswith('husky.neu.edu'):
                     continue
+                usr = server.get_member_named(discord_username)
                 if usr is None:
                     print(f'User {discord_username} does not exist!')
                     if ' #' in discord_username:
