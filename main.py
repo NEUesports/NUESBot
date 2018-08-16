@@ -162,7 +162,7 @@ async def poll_sheet():
                 first_names = sheet.col_values(6)[1:][::-1]
                 ingame_names = sheet.col_values(7)[1:][::-1]
             except gspread.exceptions.APIError:
-                log_msg('API error checking sheet, sleeping....')
+                await log_msg('API error checking sheet, sleeping....')
                 asyncio.sleep(120)
                 continue
             for i, email in enumerate(emails):
@@ -203,7 +203,7 @@ async def poll_sheet():
             logger.info(f'Done, sleeping...')
             await asyncio.sleep(20)  # task runs every 10 seconds
         except Exception as e:
-            log_msg(f'Error checking spreadsheet: {e}')
+            await log_msg(f'Error checking spreadsheet: {e}')
 
 #@matt mage, do we need this code block below here? I think it is doing
 #what is done above in the on_member_join function?
