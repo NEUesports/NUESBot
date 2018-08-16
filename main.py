@@ -14,7 +14,7 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 # SERVER IDs:
 test = True
-test_server = '355860577047937024'
+test_server = '465563181188907008'
 nues_server = '257145891947937808'
 
 test_log = '479719966082596865'
@@ -178,6 +178,8 @@ async def poll_sheet():
                 if not email.endswith('husky.neu.edu'):
                     continue
                 usr = server.get_member_named(discord_username)
+                if(!server):
+                    log_msg("Not able to reach the server")
                 if usr is None:
                     print(f'User {discord_username} does not exist!')
                     if ' #' in discord_username:
