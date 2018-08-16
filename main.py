@@ -218,7 +218,7 @@ async def on_server_role_update(new_role_prename, new_role_postname):
     if new_role_prename.name == 'new role':
         #if the name of the role is not the same after "new role" is updated, do the following
         if new_role_prename.name != new_role_postname.name:
-            exec_board_role = discord.utils.get(server.roles, name = "Executive Board", id = #'test_server exec board id' if test else "359036894467850262")
+            exec_board_role = discord.utils.get(server.roles, name = "Executive Board", id = '479707814026149888' if test else "359036894467850262")
             new_gamerole_msg = (exec_board_role.mention + "is" + new_role_postname.name + "a game role?")
             await log_msg(new_gamerole_msg)
             await client.add_reaction(new_gamerole_msg, '✅')
