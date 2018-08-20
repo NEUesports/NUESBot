@@ -32,6 +32,7 @@ game_roles = [
     'Hearthstone',
     'Heroes of the Storm',
     'Fortnite',
+    'League of Legends'
 ]
 
 scope = ['https://spreadsheets.google.com/feeds',
