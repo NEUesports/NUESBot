@@ -14,10 +14,10 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 # SERVER IDs:
 test = True
-test_server = '355860577047937024'
+test_server = '465563181188907008'
 nues_server = '257145891947937808'
 
-test_log = '451514381432389642'
+test_log = '479719966082596865'
 nues_log = '441692695937810432'
 
 test_execboard = '479707814026149888'
@@ -76,7 +76,7 @@ async def remove_role(server: discord.Server, user: discord.Member, role_name: s
 
 async def log_msg(msg):
     logger.info(f'{msg}')
-    await client.send_message(discord.Object(test_log if test else nues_log), msg)
+    return await client.send_message(discord.Object(test_log if test else nues_log), msg)
 
 #eboard role definition
 exec_board_role = discord.utils.get(server.roles, name = "Executive Board", id = test_execboard if test else nues_execboard)
@@ -118,7 +118,7 @@ async def on_message(message: discord.Message):
                 if game in game_roles:
                     await remove_role(message.server, message.author, game)
                     await log_msg(f'Removed role `{game}` from `{message.author}`')
-        if not message.author.name.startswith("NUESBot"):
+        if message.author.name != client.user.name:
             await client.delete_message(message)
         empty = True
         async for log in client.logs_from(message.channel):
@@ -167,7 +167,7 @@ async def poll_sheet():
                 first_names = sheet.col_values(6)[1:][::-1]
                 ingame_names = sheet.col_values(7)[1:][::-1]
             except gspread.exceptions.APIError:
-                log_msg('API error checking sheet, sleeping....')
+                await log_msg('API error checking sheet, sleeping....')
                 asyncio.sleep(120)
                 continue
             for i, email in enumerate(emails):
@@ -208,7 +208,7 @@ async def poll_sheet():
             logger.info(f'Done, sleeping...')
             await asyncio.sleep(20)  # task runs every 10 seconds
         except Exception as e:
-            log_msg(f'Error checking spreadsheet: {e}')
+            await log_msg(f'Error checking spreadsheet: {e}')
 
 #@matt mage, do we need this code block below here? I think it is doing
 #what is done above in the on_member_join function?
@@ -217,6 +217,7 @@ async def send_welcome(user: discord.Member):
     await client.send_message(user, welcome_message)
     logger.info(f'Sent welcome message to {user}')
 
+<<<<<<< HEAD
 #Ask if newly creted role is game role.
 @client.event
 async def on_server_role_create(new_role):
@@ -237,23 +238,30 @@ async def on_server_role_create(new_role):
         await client.delete_message(new_gamerole_msg)
 
 #Event to ask if role is a game role if the name is updated from "new role"
+=======
+#This below should always check when role "new role" has been updated to see if the name has changed
+>>>>>>> 669184314db2027dff7d7f9e2c93c57e2dea234f
 @client.event
 async def on_server_role_update(new_role_prename, new_role_postname):
     if new_role_prename.name == 'new role':
         if new_role_prename.name != new_role_postname.name:
-            new_gamerole_msg = (exec_board_role.mention + "is" + new_role_postname.name + "a game role?")
-            await log_msg(new_gamerole_msg)
-            await client.add_reaction(new_gamerole_msg, '✅')
+            server = client.get_server(test_server if test else nues_server)
+            exec_board_role = discord.utils.get(server.roles, name = "Executive Board", id = '479707814026149888' if test else "359036894467850262")
+            new_gamerole_msg = (exec_board_role.mention + " is " + new_role_postname.name + " a game role?")
+            new_gamerole_msg = await log_msg(new_gamerole_msg)
             await client.add_reaction(new_gamerole_msg, '❌')
+            await client.add_reaction(new_gamerole_msg, '✅')
             res = await client.wait_for_reaction(['✅', '❌'], message= new_gamerole_msg)
             await log_msg("Thank you for your feedback!")
             if(res.reaction.emoji=='✅'):
                 #add the game role to the game_roles list
                 #build a new GRMsg and edit the old one with the new one
-                game_roles.append(new_role_postname.name)
-                role_msg.id = '451547972161896448'
+                set_roles_channel = client.get_channel('465609299285245955' if test else '451532020695433217')
+                temp_role_msg = await client.send_message(set_roles_channel, "pls work")
+                log_msg("just sent roles message")
+                role_msg = client.get_message(set_roles_channel, '479742401703968770' if test else '451547972161896448')
                 new_GRmsg = await buildGRMsg()
-                await client.edit_message(role_msg, new_GRmsg)
+                await client.edit_message(temp_role_msg, new_GRmsg)
             await client.delete_message(new_gamerole_msg)
 
 
