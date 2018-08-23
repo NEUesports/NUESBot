@@ -13,7 +13,7 @@ handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w'
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 # SERVER IDs:
-test = False
+test = True
 test_server = '355860577047937024'
 nues_server = '257145891947937808'
 
@@ -199,12 +199,21 @@ async def poll_sheet():
         except Exception as e:
             log_msg(f'Error checking spreadsheet: {e}')
 
-
 async def send_welcome(user: discord.Member):
     welcome_message = sheet2.col_values(1)[1]
     await client.send_message(user, welcome_message)
     logger.info(f'Sent welcome message to {user}')
 
+async def protected_game_channels():
+    await client.wait_until_ready()
+    counter = 0
+    members = client.get_all_members()
+    while not client.is_closed:
+        counter += 1
+        #if usr has gamerole and doesnt have student role, remove gamerole
+        await asyncio.sleep(86400) #task runs once a day
+
+client.loop.create_task(protected_game_channels())
 client.loop.create_task(dontcrash())
 client.loop.create_task(poll_sheet())
 
