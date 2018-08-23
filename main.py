@@ -78,9 +78,6 @@ async def log_msg(msg):
     logger.info(f'{msg}')
     return await client.send_message(discord.Object(test_log if test else nues_log), msg)
 
-#eboard role definition
-exec_board_role = discord.utils.get(server.roles, name = "Executive Board", id = test_execboard if test else nues_execboard)
-
 @client.event
 async def on_message(message: discord.Message):
     if message.content.startswith('!test') and has_role(message.author, 'Student'):
@@ -221,19 +218,23 @@ async def send_welcome(user: discord.Member):
 @client.event
 async def on_server_role_create(new_role):
     if new_role.name != 'new role':
-        new_gamerole_msg = (exec_board_role.mention + "is" + new_role.name + "a game role?")
-        await log_msg(new_gamerole_msg)
-        await client.add_reaction(new_gamerole_msg, '✅')
+        server = client.get_server(test_server if test else nues_server)
+        exec_board_role = discord.utils.get(server.roles, name = "Executive Board", id = test_execboard if test else nues_execboard)
+        new_gamerole_msg = (exec_board_role.mention + " is " + new_role.name + " a game role?")
+        new_gamerole_msg = await log_msg(new_gamerole_msg)
         await client.add_reaction(new_gamerole_msg, '❌')
+        await client.add_reaction(new_gamerole_msg, '✅')
         res = await client.wait_for_reaction(['✅', '❌'], message= new_gamerole_msg)
         await log_msg("Thank you for your feedback!")
         if(res.reaction.emoji=='✅'):
             #add the game role to the game_roles list
             #build a new GRMsg and edit the old one with the new one
-            game_roles.append(new_role.name)
-            role_msg.id = '451547972161896448'
+            set_roles_channel = client.get_channel('465609299285245955' if test else '451532020695433217')
+            temp_role_msg = await client.send_message(set_roles_channel, "Updating Game Role MSG")
+            log_msg("just sent roles message")
+            role_msg = client.get_message(set_roles_channel, '479742401703968770' if test else '451547972161896448')
             new_GRmsg = await buildGRMsg()
-            await client.edit_message(role_msg, new_GRmsg)
+            await client.edit_message(temp_role_msg, new_GRmsg)
         await client.delete_message(new_gamerole_msg)
 
 #Event to ask if role is a game role if the name is updated from "new role"
@@ -242,7 +243,7 @@ async def on_server_role_update(new_role_prename, new_role_postname):
     if new_role_prename.name == 'new role':
         if new_role_prename.name != new_role_postname.name:
             server = client.get_server(test_server if test else nues_server)
-            exec_board_role = discord.utils.get(server.roles, name = "Executive Board", id = '479707814026149888' if test else "359036894467850262")
+            exec_board_role = discord.utils.get(server.roles, name = "Executive Board", id = test_execboard if test else nues_execboard)
             new_gamerole_msg = (exec_board_role.mention + " is " + new_role_postname.name + " a game role?")
             new_gamerole_msg = await log_msg(new_gamerole_msg)
             await client.add_reaction(new_gamerole_msg, '❌')
@@ -253,7 +254,7 @@ async def on_server_role_update(new_role_prename, new_role_postname):
                 #add the game role to the game_roles list
                 #build a new GRMsg and edit the old one with the new one
                 set_roles_channel = client.get_channel('465609299285245955' if test else '451532020695433217')
-                temp_role_msg = await client.send_message(set_roles_channel, "pls work")
+                temp_role_msg = await client.send_message(set_roles_channel, "Updating Game Role MSG")
                 log_msg("just sent roles message")
                 role_msg = client.get_message(set_roles_channel, '479742401703968770' if test else '451547972161896448')
                 new_GRmsg = await buildGRMsg()
