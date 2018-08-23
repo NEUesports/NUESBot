@@ -20,6 +20,9 @@ nues_server = '257145891947937808'
 test_log = '451514381432389642'
 nues_log = '441692695937810432'
 
+test_execboard = '479707814026149888'
+nues_execboard = '359036894467850262'
+
 set_roles_channel = '451532020695433217'
 
 # VALID GAME ROLES
@@ -46,7 +49,7 @@ sheet2 = gc.open_by_key("1zMeLAnlh8-EyXA20XPVv1nHHWu52dlcjPxojLVYR5DA").get_work
 
 client = discord.Client()
 
-server = discord.Object(test_server if test else nues_server)
+server = client.get_server(test_server if test else nues_server)
 
 @client.event
 async def on_ready():
@@ -75,6 +78,8 @@ async def log_msg(msg):
     logger.info(f'{msg}')
     await client.send_message(discord.Object(test_log if test else nues_log), msg)
 
+#eboard role definition
+exec_board_role = discord.utils.get(server.roles, name = "Executive Board", id = test_execboard if test else nues_execboard)
 
 @client.event
 async def on_message(message: discord.Message):
@@ -212,14 +217,29 @@ async def send_welcome(user: discord.Member):
     await client.send_message(user, welcome_message)
     logger.info(f'Sent welcome message to {user}')
 
+#Ask if newly creted role is game role.
+@client.event
+async def on_server_role_create(new_role):
+    if new_role.name != 'new role':
+        new_gamerole_msg = (exec_board_role.mention + "is" + new_role.name + "a game role?")
+        await log_msg(new_gamerole_msg)
+        await client.add_reaction(new_gamerole_msg, '✅')
+        await client.add_reaction(new_gamerole_msg, '❌')
+        res = await client.wait_for_reaction(['✅', '❌'], message= new_gamerole_msg)
+        await log_msg("Thank you for your feedback!")
+        if(res.reaction.emoji=='✅'):
+            #add the game role to the game_roles list
+            #build a new GRMsg and edit the old one with the new one
+            game_roles.append(new_role.name)
+            role_msg.id = '451547972161896448'
+            new_GRmsg = await buildGRMsg()
+            await client.edit_message(role_msg, new_GRmsg)
+        await client.delete_message(new_gamerole_msg)
 
-#eboard role definition
-exec_board_role = discord.utils.get(server.roles, name = "Executive Board", id = "359036894467850262")
-#This below should always check when role "new role" has been updated to see if the name has changed
+#Event to ask if role is a game role if the name is updated from "new role"
 @client.event
 async def on_server_role_update(new_role_prename, new_role_postname):
     if new_role_prename.name == 'new role':
-        #if the name of the role is not the same after "new role" is updated, do the following
         if new_role_prename.name != new_role_postname.name:
             new_gamerole_msg = (exec_board_role.mention + "is" + new_role_postname.name + "a game role?")
             await log_msg(new_gamerole_msg)
