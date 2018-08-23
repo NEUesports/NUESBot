@@ -217,7 +217,6 @@ async def send_welcome(user: discord.Member):
     await client.send_message(user, welcome_message)
     logger.info(f'Sent welcome message to {user}')
 
-<<<<<<< HEAD
 #Ask if newly creted role is game role.
 @client.event
 async def on_server_role_create(new_role):
@@ -238,9 +237,6 @@ async def on_server_role_create(new_role):
         await client.delete_message(new_gamerole_msg)
 
 #Event to ask if role is a game role if the name is updated from "new role"
-=======
-#This below should always check when role "new role" has been updated to see if the name has changed
->>>>>>> 669184314db2027dff7d7f9e2c93c57e2dea234f
 @client.event
 async def on_server_role_update(new_role_prename, new_role_postname):
     if new_role_prename.name == 'new role':
