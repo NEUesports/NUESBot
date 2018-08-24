@@ -203,7 +203,7 @@ async def poll_sheet():
                     except Exception as exc:
                         await log_msg(f'Could not send role set message to {usr.mention}! {exc}')
             logger.info(f'Done, sleeping...')
-            await asyncio.sleep(20)  # task runs every 10 seconds
+            await asyncio.sleep(20)  # task runs every 20 seconds
         except Exception as e:
             await log_msg(f'Error checking spreadsheet: {e}')
 
@@ -224,6 +224,7 @@ async def on_server_role_create(new_role):
         new_gamerole_msg = await log_msg(new_gamerole_msg)
         await client.add_reaction(new_gamerole_msg, '❌')
         await client.add_reaction(new_gamerole_msg, '✅')
+        await asyncio.sleep(1)
         res = await client.wait_for_reaction(['✅', '❌'], message= new_gamerole_msg)
         await log_msg("Thank you for your feedback!")
         if(res.reaction.emoji=='✅'):
@@ -248,6 +249,7 @@ async def on_server_role_update(new_role_prename, new_role_postname):
             new_gamerole_msg = await log_msg(new_gamerole_msg)
             await client.add_reaction(new_gamerole_msg, '❌')
             await client.add_reaction(new_gamerole_msg, '✅')
+            await asyncio.sleep(1)
             res = await client.wait_for_reaction(['✅', '❌'], message= new_gamerole_msg)
             await log_msg("Thank you for your feedback!")
             if(res.reaction.emoji=='✅'):
