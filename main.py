@@ -229,7 +229,7 @@ async def on_server_role_create(new_role):
         await log_msg("Thank you for your feedback!")
         if(res.reaction.emoji=='✅'):
             #add the game role to the game_roles list
-            await game_roles.append(new_role.name)
+            game_roles.append(new_role.name)
             #build a new GRMsg and edit the old one with the new one
             set_roles_channel = client.get_channel('465609299285245955' if test else '451532020695433217')
             role_msg = client.get_message(set_roles_channel, '482608179104972820' if test else '451547972161896448')
