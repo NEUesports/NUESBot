@@ -233,7 +233,7 @@ async def on_server_role_create(new_role):
             temp_role_msg = await client.send_message(set_roles_channel, "Updating Game Role MSG")
             log_msg("just sent roles message")
             role_msg = client.get_message(set_roles_channel, '479742401703968770' if test else '451547972161896448')
-            new_GRmsg = await buildGRMsg()
+            new_GRmsg = buildGRMsg()
             await client.edit_message(temp_role_msg, new_GRmsg)
         await client.delete_message(new_gamerole_msg)
 
@@ -257,7 +257,7 @@ async def on_server_role_update(new_role_prename, new_role_postname):
                 temp_role_msg = await client.send_message(set_roles_channel, "Updating Game Role MSG")
                 log_msg("just sent roles message")
                 role_msg = client.get_message(set_roles_channel, '479742401703968770' if test else '451547972161896448')
-                new_GRmsg = await buildGRMsg()
+                new_GRmsg = buildGRMsg()
                 await client.edit_message(temp_role_msg, new_GRmsg)
             await client.delete_message(new_gamerole_msg)
 
