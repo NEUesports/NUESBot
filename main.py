@@ -206,7 +206,7 @@ async def send_welcome(user: discord.Member):
 
 async def protected_game_channels():
     await client.wait_until_ready()
-    members = client.get_all_members()
+    members = await client.get_all_members()
     for member in members:
         print(member.nick)
         #if usr has gamerole and doesnt have student role, remove gamerole
