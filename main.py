@@ -225,9 +225,6 @@ async def on_server_role_create(new_role):
             #add the game role to the game_roles list
             game_roles.append(new_role.name)
             #build a new GRMsg and edit the old one with the new one
-            print(game_roles)
-            with open('game_roles.json', 'w') as f:
-                json.dump(game_roles, f, ensure_ascii=False)
             set_roles_channel = client.get_channel('465609299285245955' if test else '451532020695433217')
             role_msg = await client.get_message(set_roles_channel, '482608179104972820' if test else '451547972161896448')
             new_GRmsg = buildGRMsg()
@@ -253,9 +250,6 @@ async def on_server_role_update(new_role_prename, new_role_postname):
 
                 #add the game role to the game_roles list
                 game_roles.append(new_role_postname.name)
-                print(game_roles)
-                with open('game_roles.json', 'w') as f:
-                    json.dump(game_roles, f)
                 #build a new GRMsg and edit the old one with the new one
                 set_roles_channel = client.get_channel('465609299285245955' if test else '451532020695433217')
                 role_msg = await client.get_message(set_roles_channel, '482608179104972820' if test else '451547972161896448')
