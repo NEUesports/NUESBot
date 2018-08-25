@@ -230,6 +230,9 @@ async def on_server_role_create(new_role):
             new_GRmsg = buildGRMsg()
             await client.edit_message(role_msg, new_GRmsg)
             await log_msg("Updated Set Roles message with " + new_role.name)
+
+            with open("game_roles.json", mode="w") as f:
+                json.dump(game_roles, f)
         await client.delete_message(new_gamerole_msg)
 
 #ask if role is a game role if the name is updated from "new role"
@@ -256,6 +259,8 @@ async def on_server_role_update(new_role_prename, new_role_postname):
                 new_GRmsg = buildGRMsg()
                 await client.edit_message(role_msg, new_GRmsg)
                 await log_msg("Updated Set Roles message with " + new_role_postname.name)
+                with open("game_roles.json", mode="w") as f:
+                    json.dump(game_roles, f)
             await client.delete_message(new_gamerole_msg)
 
 
