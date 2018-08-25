@@ -26,9 +26,6 @@ nues_execboard = '359036894467850262'
 
 set_roles_channel = '451532020695433217'
 
-# VALID GAME ROLES
-game_roles = []
-
 scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
 
@@ -41,6 +38,10 @@ sheet2 = gc.open_by_key("1zMeLAnlh8-EyXA20XPVv1nHHWu52dlcjPxojLVYR5DA").get_work
 
 client = discord.Client()
 
+with open('game_roles.json') as f:
+    game_roles = json.load(f)
+print(game_roles)
+
 server = client.get_server(test_server if test else nues_server)
 
 @client.event
@@ -50,9 +51,8 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-    with open('game_roles.json') as f:
-        game_roles = json.load(f)
-        print(game_roles)
+
+
 
 
 def has_role(user, role_name):
