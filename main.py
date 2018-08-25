@@ -51,7 +51,7 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-    print(Current Game Roles:)
+    print('Current Game Roles:')
     print(game_roles)
 
 def has_role(user, role_name):
