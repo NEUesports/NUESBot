@@ -206,10 +206,9 @@ async def send_welcome(user: discord.Member):
 
 async def protected_game_channels():
     await client.wait_until_ready()
-    counter = 0
     members = client.get_all_members()
-    while not client.is_closed:
-        counter += 1
+    for member in members:
+        print(member.nick)
         #if usr has gamerole and doesnt have student role, remove gamerole
         await asyncio.sleep(86400) #task runs once a day
 
