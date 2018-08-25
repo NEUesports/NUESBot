@@ -197,7 +197,7 @@ async def poll_sheet():
             logger.info(f'Done, sleeping...')
             await asyncio.sleep(20)  # task runs every 10 seconds
         except Exception as e:
-            log_msg(f'Error checking spreadsheet: {e}')
+            await log_msg(f'Error checking spreadsheet: {e}')
 
 async def send_welcome(user: discord.Member):
     welcome_message = sheet2.col_values(1)[1]
