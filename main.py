@@ -41,7 +41,6 @@ client = discord.Client()
 
 with open('game_roles.json') as f:
     game_roles = json.load(f)
-print(game_roles)
 
 server = client.get_server(test_server if test else nues_server)
 
@@ -52,9 +51,8 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-
-
-
+    print(Current Game Roles:)
+    print(game_roles)
 
 def has_role(user, role_name):
     return any([r.name.lower() == role_name.lower() for r in user.roles])
@@ -268,7 +266,7 @@ async def on_server_role_update(new_role_prename, new_role_postname):
 
 async def protected_game_channels():
     await client.wait_until_ready()
-    members = await client.get_all_members()
+    members = client.get_all_members()
     for member in members:
         print(member.nick)
         #if usr has gamerole and doesnt have student role, remove gamerole
