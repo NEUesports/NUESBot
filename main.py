@@ -52,6 +52,7 @@ async def on_ready():
     print('------')
     with open('game_roles.json') as f:
         game_roles = json.load(f)
+        print(game_roles)
 
 
 def has_role(user, role_name):
