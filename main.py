@@ -15,11 +15,8 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 # SERVER IDs:
 test = True
-<<<<<<< HEAD
-test_server = '355860577047937024'
-=======
+
 test_server = '465563181188907008'
->>>>>>> 9c1b7b03fc1cf2b6356d9864c526c10c7e7ce84f
 nues_server = '257145891947937808'
 
 test_log = '479719966082596865'
@@ -212,17 +209,7 @@ async def send_welcome(user: discord.Member):
     await client.send_message(user, welcome_message)
     logger.info(f'Sent welcome message to {user}')
 
-<<<<<<< HEAD
-async def protected_game_channels():
-    await client.wait_until_ready()
-    members = await client.get_all_members()
-    for member in members:
-        print(member.nick)
-        #if usr has gamerole and doesnt have student role, remove gamerole
-        await asyncio.sleep(86400) #task runs once a day
 
-client.loop.create_task(protected_game_channels())
-=======
 #Ask if newly creted role is game role.
 @client.event
 async def on_server_role_create(new_role):
@@ -279,7 +266,15 @@ async def on_server_role_update(new_role_prename, new_role_postname):
             await client.delete_message(new_gamerole_msg)
 
 
->>>>>>> 9c1b7b03fc1cf2b6356d9864c526c10c7e7ce84f
+async def protected_game_channels():
+    await client.wait_until_ready()
+    members = await client.get_all_members()
+    for member in members:
+        print(member.nick)
+        #if usr has gamerole and doesnt have student role, remove gamerole
+        await asyncio.sleep(86400) #task runs once a day
+
+client.loop.create_task(protected_game_channels())
 client.loop.create_task(dontcrash())
 client.loop.create_task(poll_sheet())
 
