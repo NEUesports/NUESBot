@@ -267,6 +267,7 @@ async def on_server_role_update(new_role_prename, new_role_postname):
 async def protected_game_channels():
     await client.wait_until_ready()
     members = client.get_all_members()
+    print(members)
     for member in members:
         print(member.nick)
         #if usr has gamerole and doesnt have student role, remove gamerole
