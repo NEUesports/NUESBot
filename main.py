@@ -266,6 +266,8 @@ async def on_server_role_update(new_role_prename, new_role_postname):
 async def protected_game_channels():
     await client.wait_until_ready()
     members = client.get_all_members()
+    with open('game_roles.json') as f:
+        game_roles = json.load(f)
     for member in members:
         for game_role in game_roles
             if has_role(member, game_role) and !has_role(member, 'Student')
