@@ -278,9 +278,10 @@ async def protected_game_channels():
 async def protected_game_channels():
     await client.wait_until_ready()
     server = client.get_server(test_server if test else nues_server)
-    members = server.members
-    print(members)
-    for member in members:
+    d = server.members
+    print(d)
+    await log_msg (d.items)
+    for member in d:
         await log_msg(member)
         #if usr has gamerole and doesnt have student role, remove gamerole
         await asyncio.sleep(86400) #task runs once a day
