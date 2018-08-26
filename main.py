@@ -268,17 +268,17 @@ async def protected_game_channels():
     members = client.get_all_members()
     with open('game_roles.json') as f:
         game_roles = json.load(f)
-    print(game_roles)
-    '''
     for member in members:
+        print('made it into the first for loop')
         for game_role in game_roles
+        print('made it into the second for loop')
             if has_role(member, game_role) and !has_role(member, 'Student')
                 await remove_roles(member, game_role)
                 rem_role_msg = (f'{member} your role, {game_role}, on the Northeastern University Esports Discord has been removed since you are not registered as a student. Please register as a student using the Google Form at https://goo.gl/forms/AwC3tuYLg0GQMPYs1 to regain access to game roles.')
                 await client.send_message(user, rem_role_msg)
                 await log_msg(f'Removed {game_role} role from {user}')
     await asyncio.sleep(86400) #task runs once a day
-'''
+
 
 client.loop.create_task(protected_game_channels())
 client.loop.create_task(dontcrash())
