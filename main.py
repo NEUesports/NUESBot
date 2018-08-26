@@ -268,6 +268,8 @@ async def protected_game_channels():
     members = client.get_all_members()
     with open('game_roles.json') as f:
         game_roles = json.load(f)
+    print(game_roles)
+    '''
     for member in members:
         for game_role in game_roles
             if has_role(member, game_role) and !has_role(member, 'Student')
@@ -276,7 +278,7 @@ async def protected_game_channels():
                 await client.send_message(user, rem_role_msg)
                 await log_msg(f'Removed {game_role} role from {user}')
     await asyncio.sleep(86400) #task runs once a day
-
+'''
 
 client.loop.create_task(protected_game_channels())
 client.loop.create_task(dontcrash())
