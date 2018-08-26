@@ -269,7 +269,7 @@ async def protected_game_channels():
     members = client.get_all_members()
     print(members)
     for member in members:
-        print(member)
+        await print(member)
         #if usr has gamerole and doesnt have student role, remove gamerole
         await asyncio.sleep(86400) #task runs once a day
 
