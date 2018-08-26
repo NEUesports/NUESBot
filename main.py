@@ -263,10 +263,21 @@ async def on_server_role_update(new_role_prename, new_role_postname):
                     json.dump(game_roles, f)
             await client.delete_message(new_gamerole_msg)
 
-
+'''
+Can't figure out the generator, trying out a different method below
 async def protected_game_channels():
     await client.wait_until_ready()
     members = client.get_all_members()
+    print(members)
+    for member in members:
+        await log_msg(member)
+        #if usr has gamerole and doesnt have student role, remove gamerole
+        await asyncio.sleep(86400) #task runs once a day
+'''
+
+async def protected_game_channels():
+    await client.wait_until_ready()
+    members = server.members()
     print(members)
     for member in members:
         await log_msg(member)
