@@ -278,7 +278,7 @@ async def protected_game_channels():
 async def protected_game_channels():
     await client.wait_until_ready()
     server = client.get_server(test_server if test else nues_server)
-    members = await server.members()
+    members = await server.members
     print(members)
     for member in members:
         await log_msg(member)
