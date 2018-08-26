@@ -270,7 +270,7 @@ async def protected_game_channels():
         game_roles = json.load(f)
     for member in members:
         for game_role in game_roles:
-            if has_role(member, game_role) and !has_role(member, 'Student')
+            if has_role(member, game_role) and not has_role(member, 'Student')
                 await client.remove_roles(member, game_role)
                 rem_role_msg = (f'{member} your role, {game_role}, on the Northeastern University Esports Discord has been removed since you are not registered as a student. Please register as a student using the Google Form at https://goo.gl/forms/AwC3tuYLg0GQMPYs1 to regain access to game roles.')
                 await client.send_message(user, rem_role_msg)
