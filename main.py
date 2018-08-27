@@ -276,7 +276,7 @@ async def protected_game_channels():
                 await client.remove_roles(member, role)
                 rem_role_msg = (f'{member} your role, {game_role}, on the Northeastern University Esports Discord has been removed since you are not registered as a student. Please register as a student using the Google Form at https://goo.gl/forms/AwC3tuYLg0GQMPYs1 to regain access to game roles.')
                 await client.send_message(member, rem_role_msg)
-                await log_msg(f'Removed {game_role} role from {user}')
+                await log_msg(f'Removed {game_role} role from {member}')
     await asyncio.sleep(86400) #task runs once a day
 
 
