@@ -85,3 +85,4 @@ venv.bak/
 creds.py
 gspread.json
 .idea/
+.vscode/
