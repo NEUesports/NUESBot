@@ -275,8 +275,9 @@ async def update_gm_message():
 
 async def remove_game_role(role_name: str):
     try:
-        game_roles.remove(role_name)
-        write_game_roles_to_disk()
+        if role_name in game_roles:
+            game_roles.remove(role_name)
+            write_game_roles_to_disk()
         await update_gm_message()
         await log_msg('Removed game role ' + role_name)
     except Exception as e:
