@@ -93,7 +93,7 @@ async def on_message(message: discord.Message):
     elif message.content.startswith('!join'):
         await on_member_join(message.author)
     elif message.content.startswith('!remove') and any([r.name == 'Bot Master' for r in message.author.roles]):
-        remove_game_role(message.content.replace('!remove ', ''))
+        await remove_game_role(message.content.replace('!remove ', ''))
     elif message.channel.name == 'set-roles':
         if message.content.startswith('.iam ') and any([r.name == 'Student' for r in message.author.roles]):
             logger.info(f'User {message.author} requesting role change')
@@ -236,7 +236,7 @@ async def on_server_role_create(new_role: str):
             # add the game role to the game_roles list
             game_roles.append(new_role.name)
             # build a new GRMsg and edit the old one with the new one
-            update_gm_message()
+            await update_gm_message()
             await log_msg("Updated Set Roles message with " + new_role.name)
             write_game_roles_to_disk()
         await client.delete_message(new_gamerole_msg)
@@ -260,7 +260,7 @@ async def on_server_role_update(new_role_prename, new_role_postname):
             if res.reaction.emoji == '✅':
                 # add the game role to the game_roles list
                 game_roles.append(new_role_postname.name)
-                update_gm_message()
+                await update_gm_message()
                 await log_msg("Updated Set Roles message with " + new_role_postname.name)
                 write_game_roles_to_disk()
             await client.delete_message(new_gamerole_msg)
@@ -277,7 +277,7 @@ async def remove_game_role(role_name: str):
     try:
         game_roles.remove(role_name)
         write_game_roles_to_disk()
-        update_gm_message()
+        await update_gm_message()
         await log_msg('Removed game role ' + role_name)
     except:
         await log_msg('Error removing game role')
