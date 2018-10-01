@@ -232,14 +232,13 @@ async def on_server_role_create(new_role: str):
         await asyncio.sleep(1)
         res = await client.wait_for_reaction(['✅', '❌'], message=new_gamerole_msg)
         await log_msg("Thank you for your feedback!")
-        if (res.reaction.emoji == '✅'):
+        if res.reaction.emoji == '✅':
             # add the game role to the game_roles list
             game_roles.append(new_role.name)
             # build a new GRMsg and edit the old one with the new one
             update_gm_message()
             await log_msg("Updated Set Roles message with " + new_role.name)
-            with open("game_roles.json", mode="w") as f:
-                json.dump(game_roles, f)
+            write_game_roles_to_disk()
         await client.delete_message(new_gamerole_msg)
 
 
@@ -258,13 +257,12 @@ async def on_server_role_update(new_role_prename, new_role_postname):
             await asyncio.sleep(1)
             res = await client.wait_for_reaction(['✅', '❌'], message=new_gamerole_msg)
             await log_msg("Thank you for your feedback!")
-            if (res.reaction.emoji == '✅'):
+            if res.reaction.emoji == '✅':
                 # add the game role to the game_roles list
                 game_roles.append(new_role_postname.name)
                 update_gm_message()
                 await log_msg("Updated Set Roles message with " + new_role_postname.name)
-                with open("game_roles.json", mode="w") as f:
-                    json.dump(game_roles, f)
+                write_game_roles_to_disk()
             await client.delete_message(new_gamerole_msg)
 
 
@@ -278,10 +276,16 @@ async def update_gm_message():
 async def remove_game_role(role_name: str):
     try:
         game_roles.remove(role_name)
+        write_game_roles_to_disk()
         update_gm_message()
         await log_msg('Removed game role ' + role_name)
     except:
         await log_msg('Error removing game role')
+
+
+def write_game_roles_to_disk():
+    with open("game_roles.json", mode="w") as f:
+        json.dump(game_roles, f)
 
 
 async def protected_game_channels():
