@@ -14,7 +14,7 @@ handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w'
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 # SERVER IDs:
-test = True
+test = False
 
 test_server = '465563181188907008'
 nues_server = '257145891947937808'
@@ -92,6 +92,8 @@ async def on_message(message: discord.Message):
         await send_welcome(message.author)
     elif message.content.startswith('!join'):
         await on_member_join(message.author)
+    elif message.content.startswith('!add') and any([r.name == 'Bot Master' for r in message.author.roles]):
+        await add_game_role(message.content.replace('!add ', ''))
     elif message.content.startswith('!remove') and any([r.name == 'Bot Master' for r in message.author.roles]):
         await remove_game_role(message.content.replace('!remove ', ''))
     elif message.channel.name == 'set-roles':
@@ -271,6 +273,13 @@ async def update_gm_message():
     role_msg = await client.get_message(set_roles_channel, '482608179104972820' if test else '451547972161896448')
     new_GRmsg = buildGRMsg()
     await client.edit_message(role_msg, new_GRmsg)
+
+
+async def add_game_role(role_name: str):
+    game_roles.append(role_name)
+    write_game_roles_to_disk()
+    await update_gm_message()
+    await log_msg('Added game role ' + role_name)
 
 
 async def remove_game_role(role_name: str):
