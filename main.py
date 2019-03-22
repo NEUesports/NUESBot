@@ -297,7 +297,7 @@ async def protected_game_channels():
         game_roles = json.load(f)
     for member in members:
         for game_role in game_roles:
-            if has_role(member, game_role) and not has_role(member, 'Student'):
+            if has_role(member, game_role) and (not has_role(member, 'Student') and not has_role(member, 'Guest')):
                 role = discord.utils.get(server.roles, name=f'{game_role}')
                 await client.remove_roles(member, role)
                 rem_role_msg = (
