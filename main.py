@@ -96,6 +96,10 @@ async def on_message(message: discord.Message):
         await add_game_role(message.content.replace('!add ', ''))
     elif message.content.startswith('!remove') and any([r.name == 'Bot Master' for r in message.author.roles]):
         await remove_game_role(message.content.replace('!remove ', ''))
+    elif message.content.startswith('!edit') and any([r.name == 'Bot Master' for r in message.author.roles]):
+        cmd_list = message.content.split(' ')
+        # !edit previous_name new_name
+        await edit_game_role(cmd_list[1], cmd_list[2])
     elif message.channel.name == 'set-roles':
         if message.content.startswith('.iam ') and any([r.name == 'Student' for r in message.author.roles]):
             logger.info(f'User {message.author} requesting role change')
@@ -292,6 +296,15 @@ async def remove_game_role(role_name: str):
     except Exception as e:
         await log_msg('Error removing game role: ' + str(e))
 
+async def edit_game_role(prev_name: str, role_name: str):
+    try:
+        if prev_name in game_roles:
+             game_roles[game_roles.index(prev_name)] = role_name
+             write_game_roles_to_disk()
+             await update_gm_message()
+             await log_msg('Edited game role ' + prev_name + ' to be' + role_name)
+    except Exception as e:
+        await log_msg('Error editing game role: ' + str(e))
 
 def write_game_roles_to_disk():
     with open("game_roles.json", mode="w") as f:
