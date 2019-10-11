@@ -270,6 +270,9 @@ async def on_server_role_update(new_role_prename, new_role_postname):
                 await log_msg("Updated Set Roles message with " + new_role_postname.name)
                 write_game_roles_to_disk()
             await client.delete_message(new_gamerole_msg)
+     # update game roles
+     if new_role_prename.name in game_roles:
+         edit_game_role(new_role_prename.name, new_role_postname.name)
 
 
 async def update_gm_message():
