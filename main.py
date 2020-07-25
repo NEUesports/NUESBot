@@ -162,7 +162,7 @@ async def on_member_join(user: discord.Member):
 
 async def poll_sheet():
     await client.wait_until_ready()
-    await client.change_presence(game=discord.Game(name='Join OrgSync!'))
+    await client.change_presence(activity=discord.Game(name='Join OrgSync!'))
     while not client.is_closed:
         try:
             logger.info(f'Checking spreadsheets...')
