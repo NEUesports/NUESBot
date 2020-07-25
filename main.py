@@ -82,6 +82,10 @@ async def log_msg(msg):
 
 @client.event
 async def on_message(message: discord.Message):
+
+    if isinstance(message.channel, discord.DMChannel):
+        return
+    
     if message.content.startswith('!test') and has_role(message.author, 'Student'):
         counter = 0
         tmp = await message.channel.send('Calculating messages...')
@@ -89,7 +93,7 @@ async def on_message(message: discord.Message):
             if log.author == message.author:
                 counter += 1
 
-        await tmp.edit_message('You have {} messages.'.format(counter))
+        await tmp.edit('You have {} messages.'.format(counter))
     elif message.content.startswith('!sleep'):
         await asyncio.sleep(5)
         await message.channel.send('Done sleeping')
@@ -163,7 +167,7 @@ async def on_member_join(user: discord.Member):
 async def poll_sheet():
     await client.wait_until_ready()
     await client.change_presence(activity=discord.Game(name='Join OrgSync!'))
-    while not client.is_closed:
+    while True:
         try:
             logger.info(f'Checking spreadsheets...')
             if credentials.access_token_expired:
