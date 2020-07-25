@@ -16,16 +16,16 @@ logger.addHandler(handler)
 # SERVER IDs:
 test = False
 
-test_server = '465563181188907008'
-nues_server = '257145891947937808'
+test_server = 465563181188907008
+nues_server = 257145891947937808
 
-test_log = '479719966082596865'
-nues_log = '441692695937810432'
+test_log = 479719966082596865
+nues_log = 441692695937810432
 
-test_execboard = '479707814026149888'
-nues_execboard = '359036894467850262'
+test_execboard = 479707814026149888
+nues_execboard = 359036894467850262
 
-set_roles_channel = '451532020695433217'
+set_roles_channel = 451532020695433217
 
 scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
@@ -42,7 +42,7 @@ client = discord.Client()
 with open('game_roles.json') as f:
     game_roles = json.load(f)
 
-server = client.get_server(test_server if test else nues_server)
+server = client.get_guild(test_server if test else nues_server)
 
 
 @client.event
@@ -60,34 +60,39 @@ def has_role(user, role_name):
     return any([r.name.lower() == role_name.lower() for r in user.roles])
 
 
-async def add_role(server: discord.Server, user: discord.Member, role_name: str):
+async def add_role(server: discord.Guild, user: discord.Member, role_name: str):
     logger.info(f'Adding role {role_name} to {user}')
-    await client.add_roles(user, *[r for r in server.roles if r.name == role_name])
+    await user.add_roles(*[r for r in server.roles if r.name == role_name])
 
 
-async def remove_role(server: discord.Server, user: discord.Member, role_name: str):
+async def remove_role(server: discord.Guild, user: discord.Member, role_name: str):
     logger.info(f'Removing role {role_name} from {user}')
-    await client.remove_roles(user, *[r for r in server.roles if r.name == role_name])
+    await user.remove_roles(*[r for r in server.roles if r.name == role_name])
 
+def get_server():
+    return client.get_guild(nues_server)
+
+def get_log_channel():
+    return get_server().get_channel(test_log if test else nues_log)
 
 async def log_msg(msg):
     logger.info(f'{msg}')
-    return await client.send_message(discord.Object(test_log if test else nues_log), msg)
+    return await get_log_channel().send(msg)
 
 
 @client.event
 async def on_message(message: discord.Message):
     if message.content.startswith('!test') and has_role(message.author, 'Student'):
         counter = 0
-        tmp = await client.send_message(message.channel, 'Calculating messages...')
-        async for log in client.logs_from(message.channel, limit=100):
+        tmp = await message.channel.send('Calculating messages...')
+        async for log in message.channel.history(limit=100):
             if log.author == message.author:
                 counter += 1
 
-        await client.edit_message(tmp, 'You have {} messages.'.format(counter))
+        await tmp.edit_message('You have {} messages.'.format(counter))
     elif message.content.startswith('!sleep'):
         await asyncio.sleep(5)
-        await client.send_message(message.channel, 'Done sleeping')
+        await message.channel.send('Done sleeping')
     elif message.content.startswith('!pm'):
         await send_welcome(message.author)
     elif message.content.startswith('!join'):
@@ -105,7 +110,7 @@ async def on_message(message: discord.Message):
             for game in games:
                 game = game.strip()
                 if game in game_roles:
-                    await add_role(message.server, message.author, game)
+                    await add_role(message.guild, message.author, game)
                     await log_msg(f'Added role `{game}` to `{message.author}`')
         if message.content.startswith('.iamnot ') and any([r.name == 'Student' for r in message.author.roles]):
             msg = message.content.split(' ')
@@ -114,18 +119,18 @@ async def on_message(message: discord.Message):
             for game in games:
                 game = game.strip()
                 if game in game_roles:
-                    await remove_role(message.server, message.author, game)
+                    await remove_role(message.guild, message.author, game)
                     await log_msg(f'Removed role `{game}` from `{message.author}`')
         if message.author.name != client.user.name:
-            await client.delete_message(message)
+            await message.delete()
         empty = True
-        async for log in client.logs_from(message.channel):
+        async for log in message.channel.history():
             print(log)
             empty = False
             break
         if empty:
             m = buildGRMsg()
-            await client.send_message(message.channel, m)
+            await message.channel.send(m)
 
 
 # build the game roles message
@@ -147,7 +152,7 @@ async def dontcrash():
 async def on_member_join(user: discord.Member):
     try:
         welcome_message = sheet2.col_values(2)[1].replace('$user', f'{user.mention}')
-        await client.send_message(user, welcome_message)
+        await user.send(welcome_message)
         await log_msg(welcome_message)
     except discord.errors.Forbidden:
         await log_msg(f'Could not send welcome message to {user.mention}! It is forbidden.')
@@ -163,7 +168,7 @@ async def poll_sheet():
             logger.info(f'Checking spreadsheets...')
             if credentials.access_token_expired:
                 gc.login()  # refreshes the token
-            server = client.get_server(test_server if test else nues_server)
+            server = client.get_guild(test_server if test else nues_server)
             try:
                 ppl = sheet.col_values(3)[1:][::-1]
                 emails = sheet.col_values(2)[1:][::-1]  # reverse so we use the most recent
@@ -200,7 +205,7 @@ async def poll_sheet():
                     await log_msg(f'Added student role to `{discord_username}` with email `{email}`.')
                     if len(first_name) != 0 and len(ingame_name) != 0:
                         name = f'{first_name} "{ingame_name}"'
-                        await client.change_nickname(usr, name)
+                        await user.edit(nick=name)
                         await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
                     try:
                         await send_welcome(usr)
@@ -216,7 +221,7 @@ async def poll_sheet():
 
 async def send_welcome(user: discord.Member):
     welcome_message = sheet2.col_values(1)[1]
-    await client.send_message(user, welcome_message)
+    await user.send(welcome_message)
     logger.info(f'Sent welcome message to {user}')
 
 
@@ -224,15 +229,17 @@ async def send_welcome(user: discord.Member):
 @client.event
 async def on_server_role_create(new_role: str):
     if new_role.name != 'new role':
-        server = client.get_server(test_server if test else nues_server)
+        server = client.get_guild(test_server if test else nues_server)
         exec_board_role = discord.utils.get(server.roles, name="Executive Board",
                                             id=test_execboard if test else nues_execboard)
         new_gamerole_msg = (exec_board_role.mention + " is " + new_role.name + " a game role?")
         new_gamerole_msg = await log_msg(new_gamerole_msg)
-        await client.add_reaction(new_gamerole_msg, '✅')
-        await client.add_reaction(new_gamerole_msg, '❌')
+        await new_gamerole_msg.add_reaction('✅')
+        await new_gamerole_msg.add_reaction('❌')
         await asyncio.sleep(1)
-        res = await client.wait_for_reaction(['✅', '❌'], message=new_gamerole_msg)
+        def pred(reaction, user):
+            return str(reaction.emoji) == '✅'  or str(reaction.emoji) == '❌'
+        res = await client.wait_for("reaction_add", check=pred)
         await log_msg("Thank you for your feedback!")
         if res.reaction.emoji == '✅':
             # add the game role to the game_roles list
@@ -241,7 +248,7 @@ async def on_server_role_create(new_role: str):
             await update_gm_message()
             await log_msg("Updated Set Roles message with " + new_role.name)
             write_game_roles_to_disk()
-        await client.delete_message(new_gamerole_msg)
+        await new_gamerole_msg.delete()
 
 
 # ask if role is a game role if the name is updated from "new role"
@@ -249,15 +256,17 @@ async def on_server_role_create(new_role: str):
 async def on_server_role_update(new_role_prename, new_role_postname):
     if new_role_prename.name == 'new role':
         if new_role_prename.name != new_role_postname.name:
-            server = client.get_server(test_server if test else nues_server)
+            server = client.get_guild(test_server if test else nues_server)
             exec_board_role = discord.utils.get(server.roles, name="Executive Board",
                                                 id=test_execboard if test else nues_execboard)
             new_gamerole_msg = (exec_board_role.mention + " is " + new_role_postname.name + " a game role?")
             new_gamerole_msg = await log_msg(new_gamerole_msg)
-            await client.add_reaction(new_gamerole_msg, '✅')
-            await client.add_reaction(new_gamerole_msg, '❌')
+            await new_gamerole_msg.add_reaction('✅')
+            await new_gamerole_msg.add_reaction('❌')
             await asyncio.sleep(1)
-            res = await client.wait_for_reaction(['✅', '❌'], message=new_gamerole_msg)
+            def pred(reaction, user):
+                return str(reaction.emoji) == '✅'  or str(reaction.emoji) == '❌'
+            res = await client.wait_for("reaction_add", check=pred)
             await log_msg("Thank you for your feedback!")
             if res.reaction.emoji == '✅':
                 # add the game role to the game_roles list
@@ -265,14 +274,14 @@ async def on_server_role_update(new_role_prename, new_role_postname):
                 await update_gm_message()
                 await log_msg("Updated Set Roles message with " + new_role_postname.name)
                 write_game_roles_to_disk()
-            await client.delete_message(new_gamerole_msg)
+            await new_gamerole_msg.delete()
 
 
 async def update_gm_message():
-    set_roles_channel = client.get_channel('465609299285245955' if test else '451532020695433217')
-    role_msg = await client.get_message(set_roles_channel, '482608179104972820' if test else '451547972161896448')
+    set_roles_channel = client.get_channel(465609299285245955 if test else 451532020695433217)
+    role_msg = await set_roles_channel.fetch_message(482608179104972820 if test else 451547972161896448)
     new_GRmsg = buildGRMsg()
-    await client.edit_message(role_msg, new_GRmsg)
+    await role_msg.edit(new_GRmsg)
 
 
 async def add_game_role(role_name: str):
@@ -301,17 +310,17 @@ def write_game_roles_to_disk():
 async def protected_game_channels():
     await client.wait_until_ready()
     members = client.get_all_members()
-    server = client.get_server(test_server if test else nues_server)
+    server = client.get_guild(test_server if test else nues_server)
     with open('game_roles.json') as f:
         game_roles = json.load(f)
     for member in members:
         for game_role in game_roles:
             if has_role(member, game_role) and (not has_role(member, 'Student') and not has_role(member, 'Guest')):
                 role = discord.utils.get(server.roles, name=f'{game_role}')
-                await client.remove_roles(member, role)
+                await member.remove_roles(role)
                 rem_role_msg = (
                     f'{member} your role, {game_role}, on the Northeastern University Esports Discord has been removed since you are not registered as a student. Please register as a student using the Google Form at https://goo.gl/forms/AwC3tuYLg0GQMPYs1 to regain access to game roles.')
-                await client.send_message(member, rem_role_msg)
+                member.send(rem_role_msg)
                 await log_msg(f'Removed `{game_role}` role from `{member}`')
     await asyncio.sleep(86400)  # task runs once a day
 
