@@ -193,7 +193,7 @@ async def poll_sheet():
                     ingame_name = ingame_names[i]
                 else:
                     ingame_name = ""
-                if not email.endswith('husky.neu.edu'):
+                if not (email.endswith('husky.neu.edu') or email.endswith('northeastern.edu')):
                     continue
                 usr = server.get_member_named(discord_username)
                 if usr is None:
@@ -210,7 +210,7 @@ async def poll_sheet():
                     await log_msg(f'Added student role to `{discord_username}` with email `{email}`.')
                     if len(first_name) != 0 and len(ingame_name) != 0:
                         name = f'{first_name} "{ingame_name}"'
-                        await user.edit(nick=name)
+                        await usr.edit(nick=name)
                         await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
                     try:
                         await send_welcome(usr)
@@ -223,7 +223,6 @@ async def poll_sheet():
         except Exception as e:
             traceback.print_exc()
             await log_msg(f'Error checking spreadsheet: {e}')
-            break
 
 
 async def send_welcome(user: discord.Member):
