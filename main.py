@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import traceback
 
 import discord
 import gspread
@@ -220,7 +221,9 @@ async def poll_sheet():
             logger.info(f'Done, sleeping...')
             await asyncio.sleep(20)  # task runs every 20 seconds
         except Exception as e:
+            traceback.print_exc()
             await log_msg(f'Error checking spreadsheet: {e}')
+            break
 
 
 async def send_welcome(user: discord.Member):
