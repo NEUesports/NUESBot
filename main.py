@@ -204,7 +204,7 @@ async def poll_sheet():
                         continue
                 if has_role(usr, 'Student'):
                     pass
-                if True:
+                else:
                     logger.info(f'User {usr} does not have student role, adding...')
                     await add_role(server, usr, 'Student')
                     await log_msg(f'Added student role to `{discord_username}` with email `{email}`.')
