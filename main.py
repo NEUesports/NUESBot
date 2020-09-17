@@ -212,7 +212,9 @@ async def poll_sheet():
                                 await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
                                 await log_msg(f"cleaning sheet of previous inputs")
                                 occurences = emails.count(email)
-                                last_idx = max(0, i-1)
+                                if occurences > 1:
+                                    print(f"need to clean occurences of: {email}")
+                                last_idx = max(0, emails.index(email))
                                 while occurences > 1:
                                     next_occurence = emails.index(email, 0, last_idx)
                                     await log_msg(f"removing row: {sheet.row_values(next_occurence)}")
