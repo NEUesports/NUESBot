@@ -205,8 +205,11 @@ async def poll_sheet():
                 if has_role(usr, 'Student'):
                     if len(first_name) != 0 and len(ingame_name) != 0:
                         name = f'{first_name} "{ingame_name}"'
-                        if name != usr.display_name:
-                            await usr.edit(nick=name) 
+                        try:
+                            if name != usr.display_name:
+                                await usr.edit(nick=name) 
+                        except:
+                            print(name)
                     pass
                 else:
                     logger.info(f'User {usr} does not have student role, adding...')
