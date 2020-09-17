@@ -223,7 +223,6 @@ async def poll_sheet():
                             for occurence in occurences:
                                 actual = len(emails) - occurence + 1
                                 await log_msg(f"removing row: {sheet.row_values(actual)}")
-                                input("Continue?")
                                 sheet.delete_row(actual)
                             
                 else:
@@ -232,6 +231,8 @@ async def poll_sheet():
                     await log_msg(f'Added student role to `{discord_username}` with email `{email}`.')
                     if len(first_name) != 0 and len(ingame_name) != 0:
                         name = f'{first_name} "{ingame_name}"'
+                        if len(name) > 32:
+                            sheet.delete_row(len(emails) - emails.index(email) + 1)
                         await usr.edit(nick=name)
                         await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
                     try:
