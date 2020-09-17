@@ -208,25 +208,23 @@ async def poll_sheet():
                 if has_role(usr, 'Student'):
                     if len(first_name) != 0 and len(ingame_name) != 0:
                         name = f'{first_name} "{ingame_name}"'
-                        try:
-                            if name != usr.display_name:
-                                await log_msg(f'changing nickname of {usr.display_name} to `{name}`')
-                                await usr.edit(nick=name) 
-                                await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
-                                await log_msg(f"cleaning sheet of previous inputs")
-                                occurences = emails.count(email)
-                                if occurences > 1:
-                                    print(f"need to clean occurences of: {email}")
-                                    skip.append(email)
-                                last_idx = max(0, emails.index(email))
-                                while occurences > 1:
-                                    next_occurence = emails.index(email, 0, last_idx)
-                                    await log_msg(f"removing row: {sheet.row_values(next_occurence)}")
-                                    input("Continue?")
-                                    sheet.delete_row(next_occurence)
-                                    occurences -= 1
-                                    last_idx = max(0, next_occurence-1)
-                    pass
+                        if name != usr.display_name:
+                            await log_msg(f'changing nickname of {usr.display_name} to `{name}`')
+                            await usr.edit(nick=name) 
+                            await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
+                            await log_msg(f"cleaning sheet of previous inputs")
+                            occurences = emails.count(email)
+                            if occurences > 1:
+                                print(f"need to clean occurences of: {email}")
+                                skip.append(email)
+                            last_idx = max(0, emails.index(email))
+                            while occurences > 1:
+                                next_occurence = emails.index(email, 0, last_idx)
+                                await log_msg(f"removing row: {sheet.row_values(next_occurence)}")
+                                input("Continue?")
+                                sheet.delete_row(next_occurence)
+                                occurences -= 1
+                                last_idx = max(0, next_occurence-1)
                 else:
                     logger.info(f'User {usr} does not have student role, adding...')
                     await add_role(server, usr, 'Student')
