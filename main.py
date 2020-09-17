@@ -208,7 +208,11 @@ async def poll_sheet():
                 if has_role(usr, 'Student'):
                     if len(first_name) != 0 and len(ingame_name) != 0:
                         name = f'{first_name} "{ingame_name}"'
+                        if len(name) > 32:
+                            sheet.delete_row(len(emails) - emails.index(email) + 1)
+                            continue
                         if name != usr.display_name:
+                            
                             await log_msg(f'changing nickname of {usr.display_name} to `{name}`')
                             await usr.edit(nick=name) 
                             await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
