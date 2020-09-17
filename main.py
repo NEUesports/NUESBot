@@ -183,7 +183,10 @@ async def poll_sheet():
                 await log_msg('API error checking sheet, sleeping....')
                 asyncio.sleep(120)
                 continue
+            skip = []
             for i, email in enumerate(emails):
+                if email in skip:
+                    continue
                 discord_username = ppl[i]
                 if i < len(first_names):
                     first_name = first_names[i]
@@ -214,6 +217,7 @@ async def poll_sheet():
                                 occurences = emails.count(email)
                                 if occurences > 1:
                                     print(f"need to clean occurences of: {email}")
+                                    skip.append(email)
                                 last_idx = max(0, emails.index(email))
                                 while occurences > 1:
                                     next_occurence = emails.index(email, 0, last_idx)
@@ -222,8 +226,6 @@ async def poll_sheet():
                                     sheet.delete_row(next_occurence)
                                     occurences -= 1
                                     last_idx = max(0, next_occurence-1)
-                        except Exception as e:
-                            await log_msg(f"couldn't change name of {usr.display_name} to {name} for reason {e}")
                     pass
                 else:
                     logger.info(f'User {usr} does not have student role, adding...')
