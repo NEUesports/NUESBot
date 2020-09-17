@@ -208,8 +208,9 @@ async def poll_sheet():
                         try:
                             if name != usr.display_name:
                                 await usr.edit(nick=name) 
-                        except:
-                            print(name)
+                                await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
+                        except e:
+                            await log_msg(f"couldn't change name of {usr.display_name} to {name} for reason {e}")
                     pass
                 else:
                     logger.info(f'User {usr} does not have student role, adding...')
