@@ -215,7 +215,7 @@ async def poll_sheet():
                                 last_idx = max(0, i-1)
                                 while occurences > 1:
                                     next_occurence = emails.index(email, 0, last_idx)
-                                    await log_msg("removing row: ", sheet.row_values(next_occurence))
+                                    await log_msg(f"removing row: {sheet.row_values(next_occurence)}")
                                     input("Continue?")
                                     sheet.delete_row(next_occurence)
                                     occurences -= 1
