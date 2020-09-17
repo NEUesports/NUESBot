@@ -181,7 +181,7 @@ async def poll_sheet():
                 ingame_names = sheet.col_values(7)[1:][::-1]
             except gspread.exceptions.APIError:
                 await log_msg('API error checking sheet, sleeping....')
-                asyncio.sleep(120)
+                await asyncio.sleep(120)
                 continue
             skip = []
             for i, email in enumerate(emails):
