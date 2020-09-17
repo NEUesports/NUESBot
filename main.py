@@ -221,9 +221,10 @@ async def poll_sheet():
                                 print(f"need to clean occurences of: {email}")
                                 skip.append(email)
                             for occurence in occurences:
-                                await log_msg(f"removing row: {sheet.row_values(occurence)}")
+                                actual = len(emails) - occurence
+                                await log_msg(f"removing row: {sheet.row_values(actual)}")
                                 input("Continue?")
-                                sheet.delete_row(occurence)
+                                sheet.delete_row(actual)
                             
                 else:
                     logger.info(f'User {usr} does not have student role, adding...')
