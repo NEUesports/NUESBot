@@ -212,22 +212,21 @@ async def poll_sheet():
                             sheet.delete_row(len(emails) - emails.index(email) + 1)
                             continue
                         if name != usr.display_name:
-                            
                             await log_msg(f'changing nickname of {usr.display_name} to `{name}`')
                             await usr.edit(nick=name) 
                             await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
-                            await log_msg(f"cleaning sheet of previous inputs")
+                            # await log_msg(f"cleaning sheet of previous inputs")
                             occurences = [i for i, x in enumerate(emails) if x == email]
                             last_occurence = emails.index(email)
-                            print("last: ", last_occurence)
+                            # print("last: ", last_occurence)
                             occurences.remove(last_occurence)
                             if len(occurences) > 0:
-                                print(f"need to clean occurences of: {email}")
+                                # print(f"need to clean occurences of: {email}")
                                 skip.append(email)
-                            for occurence in occurences:
-                                actual = len(emails) - occurence + 1
-                                await log_msg(f"removing row: {sheet.row_values(actual)}")
-                                sheet.delete_row(actual)
+                            # for occurence in occurences:
+                            #     actual = len(emails) - occurence + 1
+                            #     await log_msg(f"removing row: {sheet.row_values(actual)}")
+                            #     sheet.delete_row(actual)
                             
                 else:
                     logger.info(f'User {usr} does not have student role, adding...')
