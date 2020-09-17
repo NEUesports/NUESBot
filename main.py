@@ -181,9 +181,12 @@ async def poll_sheet():
                 ingame_names = sheet.col_values(7)[1:][::-1]
             except gspread.exceptions.APIError:
                 await log_msg('API error checking sheet, sleeping....')
-                asyncio.sleep(120)
+                await asyncio.sleep(120)
                 continue
+            skip = []
             for i, email in enumerate(emails):
+                if email in skip:
+                    continue
                 discord_username = ppl[i]
                 if i < len(first_names):
                     first_name = first_names[i]
@@ -205,15 +208,29 @@ async def poll_sheet():
                 if has_role(usr, 'Student'):
                     if len(first_name) != 0 and len(ingame_name) != 0:
                         name = f'{first_name} "{ingame_name}"'
+                        if len(name) > 32:
+                            sheet.delete_row(len(emails) - emails.index(email) + 1)
+                            continue
                         if name != usr.display_name:
+                            await log_msg(f'changing nickname of {usr.display_name} to `{name}`')
                             await usr.edit(nick=name) 
-                    pass
+                            await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
+                            occurences = [i for i, x in enumerate(emails) if x == email]
+                            last_occurence = emails.index(email)
+                            occurences.remove(last_occurence)
+                            if len(occurences) > 0:
+                                skip.append(email)
+                            
                 else:
                     logger.info(f'User {usr} does not have student role, adding...')
-                    await add_role(server, usr, 'Student')
-                    await log_msg(f'Added student role to `{discord_username}` with email `{email}`.')
                     if len(first_name) != 0 and len(ingame_name) != 0:
                         name = f'{first_name} "{ingame_name}"'
+                        if len(name) > 32:
+                            await usr.send("Please sign up again, you incorrectly filled the form")
+                            sheet.delete_row(len(emails) - emails.index(email) + 1)
+                            continue
+                        await add_role(server, usr, 'Student')
+                        await log_msg(f'Added student role to `{discord_username}` with email `{email}`.')
                         await usr.edit(nick=name)
                         await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
                     try:
