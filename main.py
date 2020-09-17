@@ -233,6 +233,7 @@ async def poll_sheet():
                         name = f'{first_name} "{ingame_name}"'
                         if len(name) > 32:
                             sheet.delete_row(len(emails) - emails.index(email) + 1)
+                            continue
                         await usr.edit(nick=name)
                         await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
                     try:
