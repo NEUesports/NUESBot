@@ -215,28 +215,22 @@ async def poll_sheet():
                             await log_msg(f'changing nickname of {usr.display_name} to `{name}`')
                             await usr.edit(nick=name) 
                             await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
-                            # await log_msg(f"cleaning sheet of previous inputs")
                             occurences = [i for i, x in enumerate(emails) if x == email]
                             last_occurence = emails.index(email)
-                            # print("last: ", last_occurence)
                             occurences.remove(last_occurence)
                             if len(occurences) > 0:
-                                # print(f"need to clean occurences of: {email}")
                                 skip.append(email)
-                            # for occurence in occurences:
-                            #     actual = len(emails) - occurence + 1
-                            #     await log_msg(f"removing row: {sheet.row_values(actual)}")
-                            #     sheet.delete_row(actual)
                             
                 else:
                     logger.info(f'User {usr} does not have student role, adding...')
-                    await add_role(server, usr, 'Student')
-                    await log_msg(f'Added student role to `{discord_username}` with email `{email}`.')
                     if len(first_name) != 0 and len(ingame_name) != 0:
                         name = f'{first_name} "{ingame_name}"'
                         if len(name) > 32:
+                            await usr.send("Please sign up again, you incorrectly filled the form")
                             sheet.delete_row(len(emails) - emails.index(email) + 1)
                             continue
+                        await add_role(server, usr, 'Student')
+                        await log_msg(f'Added student role to `{discord_username}` with email `{email}`.')
                         await usr.edit(nick=name)
                         await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
                     try:
