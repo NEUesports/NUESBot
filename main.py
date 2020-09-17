@@ -207,9 +207,10 @@ async def poll_sheet():
                         name = f'{first_name} "{ingame_name}"'
                         try:
                             if name != usr.display_name:
+                                await log_msg(f'changing nickname of {usr.display_name} to `{name}`')
                                 await usr.edit(nick=name) 
                                 await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
-                        except e:
+                        except Exception as e:
                             await log_msg(f"couldn't change name of {usr.display_name} to {name} for reason {e}")
                     pass
                 else:
