@@ -210,6 +210,16 @@ async def poll_sheet():
                                 await log_msg(f'changing nickname of {usr.display_name} to `{name}`')
                                 await usr.edit(nick=name) 
                                 await log_msg(f'Succesfully set nickname of {usr.mention} to `{name}`')
+                                await log_msg(f"cleaning sheet of previous inputs")
+                                occurences = emails.count(email)
+                                last_idx = max(0, i-1)
+                                while occurences > 1:
+                                    next_occurence = emails.index(email, 0, last_idx)
+                                    await log_msg("removing row: ", sheet.row_values(next_occurence))
+                                    input("Continue?")
+                                    sheet.delete_row(next_occurence)
+                                    occurences -= 1
+                                    last_idx = max(0, next_occurence-1)
                         except Exception as e:
                             await log_msg(f"couldn't change name of {usr.display_name} to {name} for reason {e}")
                     pass
