@@ -221,7 +221,7 @@ async def poll_sheet():
                                 print(f"need to clean occurences of: {email}")
                                 skip.append(email)
                             for occurence in occurences:
-                                actual = len(emails) - occurence
+                                actual = len(emails) - occurence + 1
                                 await log_msg(f"removing row: {sheet.row_values(actual)}")
                                 input("Continue?")
                                 sheet.delete_row(actual)
