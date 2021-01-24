@@ -38,7 +38,9 @@ gc = gspread.authorize(credentials)
 sheet = gc.open_by_key("1zMeLAnlh8-EyXA20XPVv1nHHWu52dlcjPxojLVYR5DA").sheet1
 sheet2 = gc.open_by_key("1zMeLAnlh8-EyXA20XPVv1nHHWu52dlcjPxojLVYR5DA").get_worksheet(1)
 
-client = discord.Client()
+intents = discord.Intents.default()
+intents.members = True
+client = discord.Client(intents=intents)
 
 with open('game_roles.json') as f:
     game_roles = json.load(f)
