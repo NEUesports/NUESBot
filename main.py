@@ -204,6 +204,7 @@ async def poll_sheet():
                         usr = server.get_member_named(discord_username.replace(' #', '#'))
                     if usr is None:
                         print(f'User {discord_username} does not exist!')
+                        input("Is this an error?")
                         continue
                 if has_role(usr, 'Student'):
                     if len(first_name) != 0 and len(ingame_name) != 0:
@@ -221,7 +222,6 @@ async def poll_sheet():
                             if len(occurences) > 0:
                                 skip.append(email)
                 else:
-                    input(f"Continue on User {usr}?")
                     logger.info(f'User {usr} does not have student role, adding...')
                     if len(first_name) != 0 and len(ingame_name) != 0:
                         name = f'{first_name} "{ingame_name}"'
