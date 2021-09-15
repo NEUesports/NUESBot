@@ -152,7 +152,7 @@ def buildGRMsg():
 
 async def dontcrash():
     channels = client.get_all_channels()
-    asyncio.sleep(50)
+    await asyncio.sleep(50)
 
 
 @client.event
@@ -342,7 +342,7 @@ async def protected_game_channels():
                 await member.remove_roles(role)
                 rem_role_msg = (
                     f'{member} your role, {game_role}, on the Northeastern University Esports Discord has been removed since you are not registered as a student. Please register as a student using the Google Form at https://goo.gl/forms/AwC3tuYLg0GQMPYs1 to regain access to game roles.')
-                member.send(rem_role_msg)
+                await member.send(rem_role_msg)
                 await log_msg(f'Removed `{game_role}` role from `{member}`')
     await asyncio.sleep(86400)  # task runs once a day
 
